@@ -210,7 +210,39 @@ main {
   background: var(--surface);
   width: 100%;
 }
-.output-textarea { background: #fafbff; }
+.output-textarea { background: #fafbff; cursor: text; }
+
+/* ── Ruler ────────────────────────────────────── */
+.ruler {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 16px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  user-select: none;
+}
+.ruler-tick {
+  font-size: 10px;
+  color: #bbb;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.2px;
+  position: relative;
+}
+.ruler-tick::before {
+  content: '';
+  display: block;
+  width: 1px;
+  height: 4px;
+  background: #ddd;
+  margin: 0 auto 1px;
+}
+.ruler-tick.ruler-max {
+  color: var(--accent);
+  font-weight: 600;
+}
+.ruler-tick.ruler-max::before { background: var(--accent); }
 
 /* Divider */
 .divider {
@@ -227,23 +259,6 @@ main {
 }
 
 /* ── Buttons ──────────────────────────────────── */
-.setting-run { margin-left: auto; }
-.btn-run {
-  padding: 7px 22px;
-  border-radius: var(--r-sm);
-  border: none;
-  background: var(--accent);
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background var(--t), transform var(--t);
-  white-space: nowrap;
-}
-.btn-run:hover  { background: var(--accent-h); }
-.btn-run:active { transform: scale(.97); }
-
 .btn-clear, .btn-copy {
   padding: 4px 10px;
   border-radius: var(--r-sm);

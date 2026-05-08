@@ -18,14 +18,30 @@ window.addEventListener('load', () => {
   process();
 });
 
+function buildRulers(maxChars) {
+  const step = 5;
+  const ticks = [];
+  for (let i = step; i <= maxChars; i += step) ticks.push(i);
+  if (ticks.at(-1) !== maxChars) ticks.push(maxChars);
+  const html = ticks.map(n =>
+    `<span class="ruler-tick${n === maxChars ? ' ruler-max' : ''}">${n}</span>`
+  ).join('');
+  document.getElementById('rulerLeft').innerHTML  = html;
+  document.getElementById('rulerRight').innerHTML = html;
+}
+
 function bindEvents() {
-  document.getElementById('inputText').addEventListener('input',  scheduleProcess);
-  document.getElementById('maxChars').addEventListener('input',   scheduleProcess);
+  document.getElementById('inputText').addEventListener('input',    scheduleProcess);
+  document.getElementById('maxChars').addEventListener('input', () => {
+    const v = Math.max(10, parseInt(document.getElementById('maxChars').value) || 30);
+    buildRulers(v);
+    scheduleProcess();
+  });
   document.getElementById('removePunct').addEventListener('change', scheduleProcess);
   document.getElementById('removeBlank').addEventListener('change', scheduleProcess);
-  document.getElementById('clearBtn').addEventListener('click',   clearInput);
-  document.getElementById('copyBtn').addEventListener('click',    copyOutput);
-  document.getElementById('runBtn').addEventListener('click',     process);
+  document.getElementById('clearBtn').addEventListener('click',     clearInput);
+  document.getElementById('copyBtn').addEventListener('click',      copyOutput);
+  buildRulers(30);
 }
 
 function scheduleProcess() {
@@ -229,8 +245,13 @@ function processParagraph(para, maxChars) {
     .filter(s => s.trim());
 
   for (const sent of sentences) {
-    const core = sent.endsWith('。') ? sent.slice(0, -1) : sent;
-    if (core.trim()) lines.push(...processSentence(core.trim(), maxChars));
+    const hasPeriod = sent.endsWith('。');
+    const core = hasPeriod ? sent.slice(0, -1) : sent;
+    if (!core.trim()) continue;
+    const processed = processSentence(core.trim(), maxChars);
+    if (processed.length > 0 && hasPeriod)
+      processed[processed.length - 1] += '。';
+    lines.push(...processed);
   }
   return lines;
 }

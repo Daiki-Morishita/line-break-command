@@ -15,7 +15,7 @@
         <span class="logo-icon">↵</span>
         <span class="logo-text">SubLine</span>
       </div>
-      <span class="tagline">字幕自動改行ツール</span>
+      <span class="tagline">動画字幕専用の自動改行ツール</span>
     </div>
   </header>
 
@@ -48,9 +48,6 @@
       <div class="setting-item" id="loaderMsg" style="display:none">
         <span class="loader-text">読み込み中...</span>
       </div>
-      <div class="setting-item setting-run">
-        <button class="btn-run" id="runBtn">変換する</button>
-      </div>
     </div>
 
     <div class="editor-grid">
@@ -63,6 +60,7 @@
             <button class="btn-clear" id="clearBtn">クリア</button>
           </div>
         </div>
+        <div class="ruler" id="rulerLeft"></div>
         <textarea
           id="inputText"
           class="editor-textarea"
@@ -85,10 +83,10 @@
             <button class="btn-copy" id="copyBtn">コピー</button>
           </div>
         </div>
+        <div class="ruler" id="rulerRight"></div>
         <textarea
           id="outputText"
           class="editor-textarea output-textarea"
-          readonly
           placeholder="処理結果がここに表示されます..."
           spellcheck="false"
         ></textarea>
