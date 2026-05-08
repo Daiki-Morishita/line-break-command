@@ -288,11 +288,23 @@ def stage1_linebreak(text: str, max_chars: int = MAX_CHARS) -> str:
     result = []
     blocks = re.split(r'\n[ \t]*\n', text.strip())
     for block in blocks:
-        joined = ''.join(l.strip() for l in block.strip().split('\n') if l.strip())
-        if not joined:
+        raw_lines = [l.strip() for l in block.strip().split('\n') if l.strip()]
+        if not raw_lines:
             result.append('')
             continue
-        result.extend(process_paragraph(joined, max_chars))
+        # Greedily merge adjacent lines only when combined effLen fits in max_chars
+        groups = []
+        cur = raw_lines[0]
+        for line in raw_lines[1:]:
+            if eff_len(cur + line) <= max_chars:
+                cur += line
+            else:
+                groups.append(cur)
+                cur = line
+        groups.append(cur)
+
+        for g in groups:
+            result.extend(process_paragraph(g, max_chars))
         result.append('')
     while result and result[-1] == '':
         result.pop()

@@ -262,9 +262,23 @@ function stage1Linebreak(text, maxChars) {
   const result = [];
   const blocks = text.trim().split(/\n[ \t]*\n/);
   for (const block of blocks) {
-    const joined = block.trim().split('\n').map(l => l.trim()).filter(Boolean).join('');
-    if (!joined) { result.push(''); continue; }
-    result.push(...processParagraph(joined, maxChars));
+    const rawLines = block.trim().split('\n').map(l => l.trim()).filter(Boolean);
+    if (!rawLines.length) { result.push(''); continue; }
+
+    // Greedily merge adjacent lines only when combined effLen fits in maxChars
+    const groups = [];
+    let cur = rawLines[0];
+    for (let i = 1; i < rawLines.length; i++) {
+      if (effLen(cur + rawLines[i]) <= maxChars) {
+        cur += rawLines[i];
+      } else {
+        groups.push(cur);
+        cur = rawLines[i];
+      }
+    }
+    groups.push(cur);
+
+    for (const g of groups) result.push(...processParagraph(g, maxChars));
     result.push('');
   }
   while (result.length && result.at(-1) === '') result.pop();
