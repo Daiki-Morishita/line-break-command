@@ -25,6 +25,7 @@ function bindEvents() {
   document.getElementById('removeBlank').addEventListener('change', scheduleProcess);
   document.getElementById('clearBtn').addEventListener('click',   clearInput);
   document.getElementById('copyBtn').addEventListener('click',    copyOutput);
+  document.getElementById('runBtn').addEventListener('click',     process);
 }
 
 function scheduleProcess() {

@@ -227,6 +227,23 @@ main {
 }
 
 /* ── Buttons ──────────────────────────────────── */
+.setting-run { margin-left: auto; }
+.btn-run {
+  padding: 7px 22px;
+  border-radius: var(--r-sm);
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--t), transform var(--t);
+  white-space: nowrap;
+}
+.btn-run:hover  { background: var(--accent-h); }
+.btn-run:active { transform: scale(.97); }
+
 .btn-clear, .btn-copy {
   padding: 4px 10px;
   border-radius: var(--r-sm);
