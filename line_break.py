@@ -280,12 +280,13 @@ def process_paragraph(para: str, max_chars: int = MAX_CHARS) -> list[str]:
 def stage1_linebreak(text: str, max_chars: int = MAX_CHARS) -> str:
     """ステージ1: 改行処理"""
     result = []
-    for para in text.strip().split('\n'):
-        para = para.strip()
-        if not para:
+    blocks = re.split(r'\n[ \t]*\n', text.strip())
+    for block in blocks:
+        joined = ''.join(l.strip() for l in block.strip().split('\n') if l.strip())
+        if not joined:
             result.append('')
             continue
-        result.extend(process_paragraph(para, max_chars))
+        result.extend(process_paragraph(joined, max_chars))
         result.append('')
     while result and result[-1] == '':
         result.pop()

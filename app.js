@@ -258,10 +258,11 @@ function processParagraph(para, maxChars) {
 
 function stage1Linebreak(text, maxChars) {
   const result = [];
-  for (const para of text.trim().split('\n')) {
-    const p = para.trim();
-    if (!p) { result.push(''); continue; }
-    result.push(...processParagraph(p, maxChars));
+  const blocks = text.trim().split(/\n[ \t]*\n/);
+  for (const block of blocks) {
+    const joined = block.trim().split('\n').map(l => l.trim()).filter(Boolean).join('');
+    if (!joined) { result.push(''); continue; }
+    result.push(...processParagraph(joined, maxChars));
     result.push('');
   }
   while (result.length && result.at(-1) === '') result.pop();
