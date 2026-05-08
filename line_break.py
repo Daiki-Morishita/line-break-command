@@ -1,259 +1,257 @@
 #!/usr/bin/env python3
 """
 日本語テキスト字幕改行ツール
-動画字幕用 - 1行最大30文字（句読点を文字数に含めない）
+BudouX による自然な文節分割 + DP最適化
 """
 
 import re
 import sys
+import math
+from functools import lru_cache
 
-MAX_CHARS = 30
-MIN_SEG = 6  # この文字数未満の読点前セグメントは次と強制結合
+import budoux
 
+MAX_CHARS = 30      # 1行の最大実効文字数（句読点を除く）
+TARGET_PER_LINE = 22  # 1行あたりの目標文字数（推奨行数計算に使用）
+
+_parser = budoux.load_default_japanese_parser()
+
+
+# ─────────────────────────────────────────
+# ユーティリティ
+# ─────────────────────────────────────────
 
 def eff_len(s: str) -> int:
     """句読点を除いた実効文字数"""
     return sum(1 for c in s if c not in '、。')
 
 
-def find_quote_ranges(text: str) -> list[tuple[int, int]]:
-    """「...」 の範囲を返す（この中では改行しない）"""
-    ranges = []
-    start = None
-    for i, c in enumerate(text):
-        if c == '「':
-            start = i
-        elif c == '」' and start is not None:
-            ranges.append((start, i))
-            start = None
-    return ranges
+def get_chunks(text: str) -> list[str]:
+    """BudouXで文節に分割"""
+    text = text.strip()
+    return _parser.parse(text) if text else []
 
 
-def in_quote(pos: int, ranges: list[tuple[int, int]]) -> bool:
-    return any(s < pos <= e for s, e in ranges)
+# ─────────────────────────────────────────
+# 改行ボーナス計算
+# ─────────────────────────────────────────
 
+_LONE_PARTICLES = set('はがをのにでへとも')
 
-def get_break_candidates(text: str) -> list[int]:
+def break_bonus(chunks: tuple[str, ...], j: int) -> int:
     """
-    自然な改行位置（インデックス）を返す。
-    鉤括弧内では改行しない。
+    チャンクjの前で改行することへのボーナス（負ほど良い改行位置）。
+    ボーナスはチャンクj-1の末尾・チャンクjの先頭で判定。
     """
-    q_ranges = find_quote_ranges(text)
-    candidates = set()
-    n = len(text)
+    n = len(chunks)
+    bonus = 0
 
-    for i, c in enumerate(text):
-        if in_quote(i + 1, q_ranges):
-            continue  # 鉤括弧内には改行を入れない
+    if j > 0:
+        prev = chunks[j - 1]
+        if prev.endswith('たら') or prev.endswith('れば'):
+            bonus -= 7   # 条件節末尾（最強の改行位置）
+        elif prev.endswith('、'):
+            quote_depth = sum(c.count('「') - c.count('」') for c in chunks[:j])
+            if quote_depth == 0:
+                bonus -= 9   # 読点での区切り（構造的な節境界）
+        elif prev.endswith('から') or prev.endswith('まで'):
+            bonus -= 4   # 複合助詞
+        elif prev.endswith('が') or prev.endswith('は'):
+            bonus -= 4   # 主語・主題助詞
+        elif prev.endswith('を') or prev.endswith('に'):
+            bonus -= 2   # 格助詞
+        elif prev.endswith('の'):
+            bonus -= 1   # 連体助詞
+        elif prev.endswith('て') or prev.endswith('で'):
+            bonus -= 1   # テ形（弱い改行）
 
-        # 鉤括弧の前で改行
-        if c == '「' and i > 0 and not in_quote(i, q_ranges):
-            candidates.add(i)
-        # 鉤括弧の後で改行
-        if c == '」' and i + 1 < n:
-            candidates.add(i + 1)
-        # 2文字複合助詞・条件形
-        if i + 2 <= n:
-            bigram = text[i:i+2]
-            if bigram in {'から', 'まで', 'より', 'ので', 'たら', 'れば',
-                          'ても', 'でも', 'には', 'では', 'とは', 'ては'}:
-                candidates.add(i + 2)
-        # 1文字助詞
-        if c in 'はがをにへとも' and i + 1 < n:
-            candidates.add(i + 1)
-        elif c in 'てで' and i + 1 < n:
-            # 「ていない」「ている」「ていた」の途中では改行しない
-            if text[i + 1] not in 'いう':
-                candidates.add(i + 1)
-        elif c in 'のや' and i + 1 < n:
-            candidates.add(i + 1)
+    if j < n:
+        if chunks[j][0] == '「':
+            bonus -= 5   # 引用開始は自然な改行ポイント
+        elif chunks[j][0] in _LONE_PARTICLES:
+            bonus += 4   # 助詞で行頭はNG
 
-    return sorted(candidates)
+    return bonus
 
 
-def dp_split(text: str, max_chars: int = MAX_CHARS) -> list[str]:
+# ─────────────────────────────────────────
+# DP最適改行（BudouXチャンクを使用）
+# ─────────────────────────────────────────
+
+def dp_break_chunks(
+    chunks: list[str],
+    max_chars: int = MAX_CHARS,
+    target_per_line: int = TARGET_PER_LINE,
+) -> list[str]:
     """
-    DPで最適改行（最小行数 → 最大行長の最小化）。
-    鉤括弧内は改行しない。
+    BudouXチャンクリストを max_chars 以内の行に分割。
+    推奨行数 = ceil(total / target_per_line) を目標とし、
+    スコア = max_raw_eff + sum_break_bonuses（小さいほど良い）を最小化。
     """
-    if eff_len(text) <= max_chars:
-        return [text]
+    if not chunks:
+        return []
 
-    n = len(text)
-    eff = [0] * (n + 1)
-    for i in range(n):
-        eff[i + 1] = eff[i] + (0 if text[i] in '、。' else 1)
+    n = len(chunks)
+    chunks_t = tuple(chunks)
 
-    total_eff = eff[n]
-    if total_eff <= max_chars:
-        return [text]
+    cumeff = [0] * (n + 1)
+    for i, c in enumerate(chunks):
+        cumeff[i + 1] = cumeff[i] + eff_len(c)
 
-    cands = set(get_break_candidates(text))
-    cands.add(0)
-    cands.add(n)
-    cands = sorted(cands)
+    total = cumeff[n]
 
-    LONE_PARTICLES = set('はがをのにでへとも')
+    if total <= max_chars:
+        return [''.join(chunks)]
 
-    def bad_break_penalty(pos: int) -> int:
-        """次の行が助詞単独で始まる場合にペナルティを付与"""
-        if pos < n and text[pos] in LONE_PARTICLES:
-            # の/に/で の後ろが助詞でなければペナルティ
-            return 4
-        return 0
+    min_n = math.ceil(total / max_chars)
+    preferred_n = max(min_n, math.ceil(total / target_per_line))
 
-    INF = float('inf')
-    dp = [(INF, INF, -1)] * (n + 1)
-    dp[0] = (0, 0, -1)
-
-    for i in cands:
-        if dp[i][0] == INF:
+    # preferred_n → preferred_n+1 → ... の順で探索
+    for target_n in [preferred_n, preferred_n + 1, preferred_n - 1]:
+        if target_n < min_n:
             continue
-        lines_n, max_l, _ = dp[i]
-        for j in cands:
-            if j <= i:
-                continue
-            seg_e = eff[j] - eff[i]
-            if seg_e == 0:
-                continue
-            if seg_e > max_chars:
+        result = _search_n_lines(chunks_t, cumeff, n, target_n, max_chars)
+        if result:
+            return result
+
+    return _force_break_chunks(chunks, max_chars)
+
+
+def _search_n_lines(
+    chunks: tuple,
+    cumeff: list,
+    n: int,
+    n_lines: int,
+    max_chars: int,
+) -> list[str] | None:
+    """
+    exactly n_lines 行での最適分割を探索。
+    スコア = max_raw_eff - sum_bonuses（降順）を最小化。
+    戻り値: 行リスト or None（不可能な場合）
+    """
+
+    @lru_cache(maxsize=None)
+    def search(start: int, remaining: int):
+        """
+        Returns (adj_score, raw_max, total_bonus, path) or None.
+        adj_score = raw_max + total_bonus (小さいほど良い).
+        """
+        if remaining == 1:
+            seg = cumeff[n] - cumeff[start]
+            if seg <= 0 or seg > max_chars:
+                return None
+            return (seg, seg, 0, (n,))
+
+        best = None
+        for end in range(start + 1, n):
+            seg = cumeff[end] - cumeff[start]
+            if seg > max_chars:
                 break
-            nl = lines_n + 1
-            nm = max(max_l, seg_e) + bad_break_penalty(j)
-            if nl < dp[j][0] or (nl == dp[j][0] and nm < dp[j][1]):
-                dp[j] = (nl, nm, i)
+            if seg == 0:
+                continue
 
-    if dp[n][0] == INF:
-        return _force_break(text, max_chars)
+            sub = search(end, remaining - 1)
+            if sub is None:
+                continue
 
-    path = []
-    pos = n
-    while pos > 0:
-        path.append(pos)
-        pos = dp[pos][2]
-    path.reverse()
+            bb = break_bonus(chunks, end)
+            sub_adj, sub_raw, sub_bonus, sub_path = sub
 
+            cur_raw = max(seg, sub_raw)
+            cur_bonus = bb + sub_bonus
+            cur_adj = cur_raw + cur_bonus  # lower = better
+            # Penalize ending a line with an unclosed 「
+            open_q = sum(c.count('「') - c.count('」') for c in chunks[start:end])
+            if open_q > 0:
+                cur_adj += 8
+
+            if best is None or cur_adj < best[0]:
+                best = (cur_adj, cur_raw, cur_bonus, (end,) + sub_path)
+
+        return best
+
+    result = search(0, n_lines)
+    search.cache_clear()
+
+    if result is None:
+        return None
+
+    _, _, _, path = result
     lines, start = [], 0
     for end in path:
-        seg = text[start:end].strip('、')
+        seg = ''.join(chunks[start:end]).strip('、')
         if seg:
             lines.append(seg)
         start = end
+
+    return lines if len(lines) == n_lines else None
+
+
+def _force_break_chunks(chunks: list[str], max_chars: int) -> list[str]:
+    """フォールバック: 強制分割"""
+    lines, buf, buf_eff = [], '', 0
+    for c in chunks:
+        ce = eff_len(c)
+        if buf_eff + ce > max_chars and buf:
+            lines.append(buf.strip('、'))
+            buf, buf_eff = c, ce
+        else:
+            buf += c
+            buf_eff += ce
+    if buf:
+        lines.append(buf.strip('、'))
     return lines
 
 
-def _force_break(text: str, max_chars: int) -> list[str]:
-    lines, remaining = [], text
-    while eff_len(remaining) > max_chars:
-        count = pos = 0
-        for i, c in enumerate(remaining):
-            if c not in '、。':
-                count += 1
-            if count >= max_chars:
-                pos = i + 1
-                break
-        lines.append(remaining[:pos].strip('、'))
-        remaining = remaining[pos:].strip('、')
-    if remaining:
-        lines.append(remaining)
-    return lines
-
+# ─────────────────────────────────────────
+# 文・段落レベル処理
+# ─────────────────────────────────────────
 
 def process_sentence(sentence: str, max_chars: int = MAX_CHARS) -> list[str]:
     """
     1文（。なし）を字幕行に変換。
-    戦略: 読点で分割 → 短いセグメントは次と結合 → max超過は助詞で分割
+    BudouXでチャンク化 → DP最適改行。
     """
+    sentence = sentence.strip()
+    if not sentence:
+        return []
     if eff_len(sentence) <= max_chars:
         return [sentence]
 
-    # 読点で分割
-    raw_parts = [p.strip() for p in sentence.split('、') if p.strip()]
+    chunks = get_chunks(sentence)
+    if not chunks:
+        return [sentence]
 
-    # 短いセグメント（MIN_SEG未満）を次のセグと強制結合
-    merged = []
-    buf = ''
-    for part in raw_parts:
-        if buf:
-            if eff_len(buf) < MIN_SEG:
-                buf = buf + part  # 短い → 強制結合（長くてもOK、後で分割）
-            elif eff_len(buf + part) <= max_chars:
-                buf = buf + part  # 合わせて30以内 → 結合
-            else:
-                merged.append(buf)
-                buf = part
-        else:
-            buf = part
-    if buf:
-        merged.append(buf)
-
-    # 各セグメントを処理してラインリストを作成（隣接ラインの結合も試みる）
-    lines: list[str] = []
-    pending = ''
-
-    for seg in merged:
-        if eff_len(seg) > max_chars:
-            # 長すぎる → dp分割
-            if pending:
-                lines.append(pending)
-                pending = ''
-            lines.extend(dp_split(seg, max_chars))
-        else:
-            # pendingと結合できるか試みる
-            combined = pending + seg if pending else seg
-            if eff_len(combined) <= max_chars:
-                pending = combined
-            else:
-                if pending:
-                    lines.append(pending)
-                pending = seg
-
-    if pending:
-        lines.append(pending)
-
-    return lines
+    return dp_break_chunks(chunks, max_chars)
 
 
 def process_annotated(para: str, max_chars: int) -> list[str]:
     """✔ などの注釈を含む段落を処理"""
     lines = []
-    # ✔ を含む行を空白区切りで分割して各アイテムを処理
     parts = re.split(r'\s*(?=✔)', para)
     for part in parts:
         part = part.strip()
         if not part:
             continue
-        # ✔アイテム末尾に後付きテキストがある場合を検出
-        # パターン: ✔ [本文] [後付き]  (後付きは✔で始まらないひとまとまり)
         if part.startswith('✔'):
-            # 末尾の。を取り除いて後付きを分離
             core = part.rstrip('。')
-            # 動詞終止形後ろの後付きを分離 (スペース区切り)
+            # ✔アイテム末尾の後付きテキストを分離
             m = re.match(
-                r'(✔[︎︎\s]*\S+(?:ない|する|いる|れる|された|ます|です|だ|い))\s+(.*)',
+                r'(✔[︎\s]*\S+(?:ない|する|いる|れる|された|ます|です|だ|い))\s+(.*)',
                 core
             )
             if m:
-                bullet = m.group(1).strip()
-                trailing = m.group(2).strip()
+                bullet, trailing = m.group(1).strip(), m.group(2).strip()
                 if bullet:
-                    _extend(lines, bullet, max_chars)
+                    lines.extend(process_sentence(bullet, max_chars))
                 if trailing:
                     lines.extend(process_sentence(trailing, max_chars))
             else:
-                _extend(lines, core, max_chars)
+                lines.extend(process_sentence(core, max_chars))
         else:
-            # 前置きテキスト
             core = part.rstrip('。')
             lines.extend(process_sentence(core, max_chars))
     return lines
-
-
-def _extend(lines: list, text: str, max_chars: int):
-    if eff_len(text) <= max_chars:
-        lines.append(text)
-    else:
-        lines.extend(dp_split(text, max_chars))
 
 
 def process_paragraph(para: str, max_chars: int = MAX_CHARS) -> list[str]:
@@ -274,6 +272,10 @@ def process_paragraph(para: str, max_chars: int = MAX_CHARS) -> list[str]:
             lines.extend(process_sentence(core, max_chars))
     return lines
 
+
+# ─────────────────────────────────────────
+# 全体処理
+# ─────────────────────────────────────────
 
 def stage1_linebreak(text: str, max_chars: int = MAX_CHARS) -> str:
     """ステージ1: 改行処理"""
@@ -305,6 +307,9 @@ def print_with_count(text: str):
             print()
 
 
+# ─────────────────────────────────────────
+# サンプルテキスト
+# ─────────────────────────────────────────
 SAMPLE = """始まった日本企業の"逆襲"
 
 先月、私たちがご紹介したある日本企業の株価が2日連続ストップ高を記録しました。
