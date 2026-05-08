@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SubLine – 字幕自動改行ツール</title>
+  <meta name="description" content="動画字幕の自然な改行を自動生成。BudouX AI搭載で最大文字数内で読みやすく分割します。">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">↵</span>
+        <span class="logo-text">SubLine</span>
+      </div>
+      <span class="tagline">字幕自動改行ツール</span>
+    </div>
+  </header>
+
+  <!-- Ad: Top banner -->
+  <div class="ad-slot ad-top" id="adTop"></div>
+
+  <main>
+    <div class="settings-bar">
+      <div class="setting-item">
+        <label for="maxChars">最大文字数</label>
+        <div class="input-with-unit">
+          <input type="number" id="maxChars" value="30" min="10" max="60">
+          <span>文字</span>
+        </div>
+      </div>
+      <div class="setting-item">
+        <label class="switch">
+          <input type="checkbox" id="removePunct">
+          <span class="slider"></span>
+          <span>句読点削除</span>
+        </label>
+      </div>
+      <div class="setting-item">
+        <label class="switch">
+          <input type="checkbox" id="removeBlank">
+          <span class="slider"></span>
+          <span>空白行削除</span>
+        </label>
+      </div>
+      <div class="setting-item" id="loaderMsg" style="display:none">
+        <span class="loader-text">読み込み中...</span>
+      </div>
+    </div>
+
+    <div class="editor-grid">
+      <!-- Left pane: Before -->
+      <div class="pane">
+        <div class="pane-header">
+          <span class="pane-title">ビフォー</span>
+          <div class="pane-meta">
+            <span class="meta-text" id="inputCount">0文字</span>
+            <button class="btn-clear" id="clearBtn">クリア</button>
+          </div>
+        </div>
+        <textarea
+          id="inputText"
+          class="editor-textarea"
+          placeholder="ここにテキストを貼り付けてください..."
+          spellcheck="false"
+          autocorrect="off"
+          autocapitalize="off"
+        ></textarea>
+      </div>
+
+      <!-- Divider -->
+      <div class="divider"><span>›</span></div>
+
+      <!-- Right pane: After -->
+      <div class="pane">
+        <div class="pane-header">
+          <span class="pane-title">アフター</span>
+          <div class="pane-meta">
+            <span class="meta-text" id="outputCount">0行</span>
+            <button class="btn-copy" id="copyBtn">コピー</button>
+          </div>
+        </div>
+        <textarea
+          id="outputText"
+          class="editor-textarea output-textarea"
+          readonly
+          placeholder="処理結果がここに表示されます..."
+          spellcheck="false"
+        ></textarea>
+      </div>
+    </div>
+  </main>
+
+  <!-- Ad: Bottom banner -->
+  <div class="ad-slot ad-bottom" id="adBottom"></div>
+
+  <footer>
+    <span>Powered by <a href="https://github.com/google/budoux" target="_blank" rel="noopener">BudouX</a></span>
+    <span class="footer-sep">·</span>
+    <a href="https://github.com/Daiki-Morishita/line-break-command" target="_blank" rel="noopener">GitHub</a>
+  </footer>
+
+  <script src="https://unpkg.com/budoux/bundle/budoux.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
