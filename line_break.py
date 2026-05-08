@@ -293,8 +293,9 @@ def stage1_linebreak(text: str, max_chars: int = MAX_CHARS) -> str:
 
 
 def stage2_finalize(text: str) -> str:
-    """ステージ2: 句読点を全て削除して完成"""
-    return text.replace('。', '').replace('、', '')
+    """ステージ2: 句読点を全て削除・空白行を除去して完成"""
+    text = text.replace('。', '').replace('、', '')
+    return '\n'.join(line for line in text.splitlines() if line.strip())
 
 
 def print_with_count(text: str):
