@@ -213,37 +213,12 @@ function processSentence(sentence, maxChars) {
   return dpBreakChunks(chunks, maxChars);
 }
 
-function processAnnotated(para, maxChars) {
+function splitBySentence(text, maxChars) {
   const lines = [];
-  for (let part of para.split(/(?=✔)/)) {
-    part = part.trim();
-    if (!part) continue;
-    if (part.startsWith('✔')) {
-      const core = part.replace(/。$/, '');
-      const m = core.match(/^(✔[︎\s]*\S+(?:ない|する|いる|れる|された|ます|です|だ|い))\s+(.*)/);
-      if (m) {
-        if (m[1].trim()) lines.push(...processSentence(m[1].trim(), maxChars));
-        if (m[2].trim()) lines.push(...processSentence(m[2].trim(), maxChars));
-      } else {
-        lines.push(...processSentence(core, maxChars));
-      }
-    } else {
-      lines.push(...processSentence(part.replace(/。$/, ''), maxChars));
-    }
-  }
-  return lines;
-}
-
-function processParagraph(para, maxChars) {
-  if (!para.trim()) return [];
-  if (/[✔※●▶]/.test(para)) return processAnnotated(para, maxChars);
-
-  const lines = [];
-  const sentences = para.trim()
+  const sentences = text.trim()
     .split('。')
     .map((s, i, arr) => i < arr.length - 1 ? s + '。' : s)
     .filter(s => s.trim());
-
   for (const sent of sentences) {
     const hasPeriod = sent.endsWith('。');
     const core = hasPeriod ? sent.slice(0, -1) : sent;
@@ -254,6 +229,33 @@ function processParagraph(para, maxChars) {
     lines.push(...processed);
   }
   return lines;
+}
+
+function processAnnotated(para, maxChars) {
+  const lines = [];
+  for (let part of para.split(/(?=✔)/)) {
+    part = part.trim();
+    if (!part) continue;
+    if (part.startsWith('✔')) {
+      const core = part.replace(/。$/, '');
+      const m = core.match(/^(✔[︎\s]*\S+(?:ない|する|いる|れる|された|ます|です|だ|い))\s+(.*)/);
+      if (m) {
+        if (m[1].trim()) lines.push(...processSentence(m[1].trim(), maxChars));
+        if (m[2].trim()) lines.push(...splitBySentence(m[2].trim(), maxChars));
+      } else {
+        lines.push(...splitBySentence(core, maxChars));
+      }
+    } else {
+      lines.push(...splitBySentence(part, maxChars));
+    }
+  }
+  return lines;
+}
+
+function processParagraph(para, maxChars) {
+  if (!para.trim()) return [];
+  if (/[✔※●▶]/.test(para)) return processAnnotated(para, maxChars);
+  return splitBySentence(para, maxChars);
 }
 
 function stage1Linebreak(text, maxChars) {

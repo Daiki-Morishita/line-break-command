@@ -225,6 +225,24 @@ def process_sentence(sentence: str, max_chars: int = MAX_CHARS) -> list[str]:
     return dp_break_chunks(chunks, max_chars)
 
 
+def split_by_sentence(text: str, max_chars: int) -> list[str]:
+    """。で分割して各文を処理（。を末尾行に復元）"""
+    lines = []
+    for sent in re.split(r'(?<=。)', text.strip()):
+        sent = sent.strip()
+        if not sent:
+            continue
+        has_period = sent.endswith('。')
+        core = sent[:-1] if has_period else sent
+        if not core:
+            continue
+        processed = process_sentence(core, max_chars)
+        if processed and has_period:
+            processed[-1] += '。'
+        lines.extend(processed)
+    return lines
+
+
 def process_annotated(para: str, max_chars: int) -> list[str]:
     """✔ などの注釈を含む段落を処理"""
     lines = []
@@ -235,7 +253,6 @@ def process_annotated(para: str, max_chars: int) -> list[str]:
             continue
         if part.startswith('✔'):
             core = part.rstrip('。')
-            # ✔アイテム末尾の後付きテキストを分離
             m = re.match(
                 r'(✔[︎\s]*\S+(?:ない|する|いる|れる|された|ます|です|だ|い))\s+(.*)',
                 core
@@ -245,12 +262,11 @@ def process_annotated(para: str, max_chars: int) -> list[str]:
                 if bullet:
                     lines.extend(process_sentence(bullet, max_chars))
                 if trailing:
-                    lines.extend(process_sentence(trailing, max_chars))
+                    lines.extend(split_by_sentence(trailing, max_chars))
             else:
-                lines.extend(process_sentence(core, max_chars))
+                lines.extend(split_by_sentence(core, max_chars))
         else:
-            core = part.rstrip('。')
-            lines.extend(process_sentence(core, max_chars))
+            lines.extend(split_by_sentence(part, max_chars))
     return lines
 
 
@@ -258,19 +274,9 @@ def process_paragraph(para: str, max_chars: int = MAX_CHARS) -> list[str]:
     """段落を字幕行リストに変換"""
     if not para.strip():
         return []
-
     if re.search(r'[✔※●▶]', para):
         return process_annotated(para, max_chars)
-
-    lines = []
-    for sent in re.split(r'(?<=。)', para.strip()):
-        sent = sent.strip()
-        if not sent:
-            continue
-        core = sent[:-1] if sent.endswith('。') else sent
-        if core:
-            lines.extend(process_sentence(core, max_chars))
-    return lines
+    return split_by_sentence(para, max_chars)
 
 
 # ─────────────────────────────────────────
