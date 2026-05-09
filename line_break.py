@@ -104,10 +104,8 @@ def dp_break_chunks(
         return [''.join(chunks)]
 
     min_n = math.ceil(total / max_chars)
-    preferred_n = max(min_n, math.ceil(total / target_per_line))
 
-    # preferred_n → preferred_n+1 → ... の順で探索
-    for target_n in [preferred_n, preferred_n + 1, preferred_n - 1]:
+    for target_n in [min_n, min_n + 1, min_n - 1]:
         if target_n < min_n:
             continue
         result = _search_n_lines(chunks_t, cumeff, n, target_n, max_chars)

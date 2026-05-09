@@ -192,10 +192,9 @@ function dpBreakChunks(chunks, maxChars) {
   const total = cumeff[n];
   if (total <= maxChars) return [chunks.join('')];
 
-  const minN       = Math.ceil(total / maxChars);
-  const preferredN = Math.max(minN, Math.ceil(total / TARGET_PER_LINE));
+  const minN = Math.ceil(total / maxChars);
 
-  for (const targetN of [preferredN, preferredN + 1, preferredN - 1]) {
+  for (const targetN of [minN, minN + 1, minN - 1]) {
     if (targetN < minN) continue;
     const result = searchNLines(chunks, cumeff, n, targetN, maxChars);
     if (result) return result;
