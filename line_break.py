@@ -226,18 +226,18 @@ def process_sentence(sentence: str, max_chars: int = MAX_CHARS) -> list[str]:
 
 
 def split_by_sentence(text: str, max_chars: int) -> list[str]:
-    """。で分割して各文を処理（。を末尾行に復元）"""
+    """。？！で分割して各文を処理（。を末尾行に復元）"""
     lines = []
-    for sent in re.split(r'(?<=。)', text.strip()):
+    for sent in re.split(r'(?<=[。？！])', text.strip()):
         sent = sent.strip()
         if not sent:
             continue
-        has_period = sent.endswith('。')
-        core = sent[:-1] if has_period else sent
+        has_maru = sent.endswith('。')
+        core = sent[:-1] if has_maru else sent
         if not core:
             continue
         processed = process_sentence(core, max_chars)
-        if processed and has_period:
+        if processed and has_maru:
             processed[-1] += '。'
         lines.extend(processed)
     return lines

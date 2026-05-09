@@ -217,16 +217,14 @@ function processSentence(sentence, maxChars) {
 
 function splitBySentence(text, maxChars) {
   const lines = [];
-  const sentences = text.trim()
-    .split('。')
-    .map((s, i, arr) => i < arr.length - 1 ? s + '。' : s)
-    .filter(s => s.trim());
+  // Split after 。？！ — each becomes its own sentence unit
+  const sentences = text.trim().split(/(?<=[。？！])/).filter(s => s.trim());
   for (const sent of sentences) {
-    const hasPeriod = sent.endsWith('。');
-    const core = hasPeriod ? sent.slice(0, -1) : sent;
+    const hasMaru = sent.endsWith('。');
+    const core = hasMaru ? sent.slice(0, -1) : sent;
     if (!core.trim()) continue;
     const processed = processSentence(core.trim(), maxChars);
-    if (processed.length > 0 && hasPeriod)
+    if (processed.length > 0 && hasMaru)
       processed[processed.length - 1] += '。';
     lines.push(...processed);
   }
