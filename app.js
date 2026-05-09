@@ -265,18 +265,19 @@ function stage1Linebreak(text, maxChars) {
     const rawLines = block.trim().split('\n').map(l => l.trim()).filter(Boolean);
     if (!rawLines.length) { result.push(''); continue; }
 
-    // Greedily merge adjacent lines only when combined effLen fits in maxChars
+    // ASCII-only lines (e.g. speaker names like "Masa") stay standalone.
+    // All other consecutive lines are joined so the DP can optimize globally.
     const groups = [];
-    let cur = rawLines[0];
-    for (let i = 1; i < rawLines.length; i++) {
-      if (effLen(cur + rawLines[i]) <= maxChars) {
-        cur += rawLines[i];
+    let buf = null;
+    for (const line of rawLines) {
+      if (/^[\x00-\x7F]+$/.test(line)) {
+        if (buf) { groups.push(buf); buf = null; }
+        groups.push(line);
       } else {
-        groups.push(cur);
-        cur = rawLines[i];
+        buf = buf ? buf + line : line;
       }
     }
-    groups.push(cur);
+    if (buf) groups.push(buf);
 
     for (const g of groups) result.push(...processParagraph(g, maxChars));
     result.push('');

@@ -292,16 +292,20 @@ def stage1_linebreak(text: str, max_chars: int = MAX_CHARS) -> str:
         if not raw_lines:
             result.append('')
             continue
-        # Greedily merge adjacent lines only when combined effLen fits in max_chars
+        # ASCII-only lines stay standalone; consecutive Japanese lines are joined
+        # so the DP can optimize the entire sentence globally.
         groups = []
-        cur = raw_lines[0]
-        for line in raw_lines[1:]:
-            if eff_len(cur + line) <= max_chars:
-                cur += line
+        buf = None
+        for line in raw_lines:
+            if all(ord(c) < 128 for c in line):
+                if buf:
+                    groups.append(buf)
+                    buf = None
+                groups.append(line)
             else:
-                groups.append(cur)
-                cur = line
-        groups.append(cur)
+                buf = (buf + line) if buf else line
+        if buf:
+            groups.append(buf)
 
         for g in groups:
             result.extend(process_paragraph(g, max_chars))
