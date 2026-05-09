@@ -101,8 +101,8 @@ function bindEvents() {
 
   document.addEventListener('click', closeAllDropdowns);
 
-  buildRulers(30);
-  updateCharWarning(30);
+  buildRulers(27);
+  updateCharWarning(27);
 }
 
 function scheduleProcess() {
@@ -133,7 +133,7 @@ function closeAllDropdowns() {
 function updateCharWarning(v) {
   const el = document.getElementById('charWarning');
   if (v > WARN_MAX) {
-    el.textContent = `⚠ 1行の文字数は${WARN_MAX}文字が最大です。`;
+    el.textContent = `⚠ 1行の文字数は${WARN_MAX}文字が最大です。字幕の文字数は26〜28文字が一般的です。`;
     el.style.display = 'block';
   } else {
     el.style.display = 'none';
@@ -154,16 +154,62 @@ function effLen(s) {
 function getChunks(text) {
   text = text.trim();
   if (!text || !parser) return [];
-  try { return parser.parse(text); } catch { return [text]; }
+  let chunks;
+  try { chunks = parser.parse(text); } catch { return [text]; }
+  chunks = mergeDigitRanges(chunks);
+  chunks = mergeListItems(chunks);
+  return chunks;
+}
+
+// 「2、3年」のような数字範囲は一塊として扱う
+function mergeDigitRanges(chunks) {
+  const out = [];
+  for (const c of chunks) {
+    const last = out.at(-1);
+    if (last && /[0-9０-９]、$/.test(last) && /^[0-9０-９]/.test(c)) {
+      out[out.length - 1] = last + c;
+    } else {
+      out.push(c);
+    }
+  }
+  return out;
+}
+
+// 「Gemini、Claude」のような並列リスト（非ひらがな要素の列挙）は結合
+// 句末助詞（は/が/を等）の後の 、 は節境界なので結合しない
+function mergeListItems(chunks) {
+  const out = [];
+  for (const c of chunks) {
+    const last = out.at(-1);
+    if (last) {
+      const m = last.match(/(.)、$/);
+      if (m && !/[ぁ-ん]/.test(m[1]) && c.length > 0 && !/[ぁ-ん\s]/.test(c[0])) {
+        out[out.length - 1] = last + c;
+        continue;
+      }
+    }
+    out.push(c);
+  }
+  return out;
 }
 
 // Returns true when a 「」 content looks like direct speech (isolate it)
 function isSpeechQuote(content) {
-  if (content.length <= 6) return false;
+  if (content.length < 5) return false;
   // Technical terms / loanwords ending with closing bracket → don't isolate
   if (/[）\]｝》〉\)]$/.test(content)) return false;
-  // Predicate/sentence-final endings → isolate
-  return /[たださよねわぞぜかなう。？！]$/.test(content);
+  // 多語末尾（です/ます/ない 等）— 1文字より優先して検査
+  if (/(?:です|ます|ません|でした|でしょう|だろう|である|ない|だった|ている|ています|ていた|していた|してい|ていく|てくる|かもしれない|はず|べき|わけ|つもり|ところ)$/.test(content)) return true;
+  // 文末記号
+  if (/[。．？！?!]$/.test(content)) return true;
+  // 動詞終止形 / 形容詞 / 助動詞 / 終助詞の末尾文字
+  // る す く つ ぬ ぶ む ぐ う = 動詞終止形
+  // い = 形容詞 / 動詞「ます」化前
+  // た = 過去
+  // だ = 断定
+  // よ ね わ ぞ ぜ か な さ = 終助詞
+  if (/[るすくつぬぶむぐういただ。？！よねわぞぜかなさ]$/.test(content)) return true;
+  return false;
 }
 
 function breakBonus(chunks, j) {
@@ -498,8 +544,8 @@ function resetDefaults() {
   document.getElementById('excludePunct').checked = true;
   document.getElementById('punctToSpace').checked = false;
   toggleReplaceBar(false);
-  buildRulers(30);
-  updateCharWarning(30);
+  buildRulers(27);
+  updateCharWarning(27);
   process();
 }
 

@@ -19,13 +19,13 @@
 }
 
 /* ── Base ─────────────────────────────────────── */
-html, body { height: 100%; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
   background: var(--bg);
   color: var(--text);
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
   font-size: 14px;
   line-height: 1.5;
 }
@@ -82,14 +82,13 @@ body {
 
 /* ── Main ─────────────────────────────────────── */
 main {
-  flex: 1;
   display: flex;
   flex-direction: column;
   padding: 16px 20px 20px;
   max-width: 1440px;
   width: 100%;
   margin: 0 auto;
-  min-height: 0;
+  min-height: calc(100vh - 62px);
 }
 
 /* ── Settings bar ─────────────────────────────── */
