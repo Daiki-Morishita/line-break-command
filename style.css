@@ -221,7 +221,6 @@ main {
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   user-select: none;
-  overflow: hidden;
 }
 .ruler-tick {
   position: absolute;

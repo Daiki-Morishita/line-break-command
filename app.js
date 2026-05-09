@@ -2,9 +2,28 @@
 const TARGET_PER_LINE = 22;
 const LONE_PARTICLES  = new Set([...'はがをのにでへとも']);
 
-let parser          = null;
-let debounceTimer   = null;
+let parser           = null;
+let debounceTimer    = null;
 let excludePunctFlag = true; // default ON = current behavior (exclude 。and 、)
+let charPixelWidth   = null; // measured width of one full-width CJK char in textarea font
+
+function measureCharWidth() {
+  const probe = document.createElement('span');
+  Object.assign(probe.style, {
+    position:      'fixed',
+    visibility:    'hidden',
+    whiteSpace:    'nowrap',
+    fontFamily:    "'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP',YuGothic,sans-serif",
+    fontSize:      '14px',
+    fontWeight:    'normal',
+    letterSpacing: 'normal'
+  });
+  probe.textContent = '一'.repeat(40);
+  document.body.appendChild(probe);
+  const w = probe.getBoundingClientRect().width / 40;
+  probe.remove();
+  return w;
+}
 
 // ── Init ───────────────────────────────────────
 window.addEventListener('load', () => {
@@ -20,13 +39,15 @@ window.addEventListener('load', () => {
 });
 
 function buildRulers(maxChars) {
+  if (!charPixelWidth) charPixelWidth = measureCharWidth();
+  const cw = charPixelWidth;
   const step = 5;
   const ticks = [];
   for (let i = step; i <= maxChars; i += step) ticks.push(i);
   if (ticks.at(-1) !== maxChars) ticks.push(maxChars);
+  // Position each tick at: textarea left-padding (16px) + n × actual char width
   const html = ticks.map(n => {
-    const frac = (n / maxChars).toFixed(5);
-    const left = `calc(16px + ${frac} * (100% - 32px))`;
+    const left = (16 + n * cw).toFixed(1) + 'px';
     return `<span class="ruler-tick${n === maxChars ? ' ruler-max' : ''}" style="left:${left}">${n}</span>`;
   }).join('');
   document.getElementById('rulerLeft').innerHTML  = html;
