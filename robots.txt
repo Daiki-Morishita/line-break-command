@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://subline.app/sitemap.xml
+Sitemap: https://line-break-command.vercel.app/sitemap.xml
