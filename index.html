@@ -109,6 +109,18 @@
       <div class="setting-item">
         <button class="btn-replace-toggle" id="replaceToggleBtn">文字の一括置換</button>
       </div>
+      <div class="setting-item">
+        <!-- Quote conversion dropdown -->
+        <div class="dropdown" id="quoteDropdown">
+          <button class="btn-quote" id="quoteBtnToggle">引用符の置換 ▾</button>
+          <div class="dropdown-menu" id="quoteMenu">
+            <button class="dropdown-item" data-quote="kagi-double">「 」→ " "　ダブルクォート</button>
+            <button class="dropdown-item" data-quote="kagi-single">「 」→ ' '　シングルクォート</button>
+            <button class="dropdown-item" data-quote="kakko-double">『 』→ " "　ダブルクォート</button>
+            <button class="dropdown-item" data-quote="kakko-single">『 』→ ' '　シングルクォート</button>
+          </div>
+        </div>
+      </div>
       <div class="setting-item" id="loaderMsg" style="display:none">
         <span class="loader-text">読み込み中...</span>
       </div>
@@ -156,17 +168,6 @@
           <div class="pane-meta">
             <span class="meta-text" id="outputCount">0行</span>
             <button class="btn-clear" id="resetBtn">リセット</button>
-
-            <!-- Quote conversion dropdown -->
-            <div class="dropdown" id="quoteDropdown">
-              <button class="btn-quote" id="quoteBtnToggle">引用符変換 ▾</button>
-              <div class="dropdown-menu" id="quoteMenu">
-                <button class="dropdown-item" data-quote="kagi-double">「 」→ " "　ダブルクォート</button>
-                <button class="dropdown-item" data-quote="kagi-single">「 」→ ' '　シングルクォート</button>
-                <button class="dropdown-item" data-quote="kakko-double">『 』→ " "　ダブルクォート</button>
-                <button class="dropdown-item" data-quote="kakko-single">『 』→ ' '　シングルクォート</button>
-              </div>
-            </div>
 
             <button class="btn-copy" id="copyBtn">コピー</button>
 
