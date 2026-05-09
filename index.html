@@ -3,9 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SubLine – 字幕自動改行ツール</title>
-  <meta name="description" content="日本語字幕・テロップ作り専用の自動改行ツール。BudouX AI搭載で最大文字数内で読みやすく分割します。">
+  <title>SubLine – 日本語字幕・テロップの自動改行ツール（無料）</title>
+  <meta name="description" content="動画の字幕・テロップ作りに最適な日本語自動改行ツール。BudouX AIで意味の切れ目を判定し、最大文字数内で読みやすく分割します。インストール不要・無料・登録なし。">
+  <meta name="keywords" content="字幕,テロップ,改行,自動改行,日本語,BudouX,動画編集,Premiere Pro,Final Cut Pro,DaVinci Resolve,YouTube">
+  <meta name="author" content="Daiki Morishita">
+  <meta name="robots" content="index,follow">
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="SubLine – 日本語字幕・テロップの自動改行ツール">
+  <meta property="og:description" content="BudouX AIで意味の切れ目を判定し、最大文字数内で読みやすく自動改行。動画の字幕・テロップ作りに最適。無料・登録不要。">
+  <meta property="og:site_name" content="SubLine">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SubLine – 日本語字幕・テロップの自動改行ツール">
+  <meta name="twitter:description" content="BudouX AIで意味の切れ目を判定し、最大文字数内で読みやすく自動改行。">
+
   <link rel="stylesheet" href="style.css">
+
+  <!-- Google AdSense (審査通過後に publisher ID を埋める) -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+
+  <!-- 構造化データ (SoftwareApplication) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "SubLine",
+    "description": "日本語字幕・テロップ作り専用の自動改行ツール。BudouX AI搭載。",
+    "applicationCategory": "MultimediaApplication",
+    "operatingSystem": "Web",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "JPY"
+    },
+    "inLanguage": "ja"
+  }
+  </script>
 </head>
 <body>
 
@@ -27,7 +62,7 @@
       <div class="setting-item">
         <label for="maxChars">最大文字数</label>
         <div class="input-with-unit">
-          <input type="number" id="maxChars" value="30" min="5" max="60">
+          <input type="number" id="maxChars" value="27" min="5" max="60">
           <span>文字</span>
         </div>
       </div>
@@ -60,7 +95,7 @@
         </label>
       </div>
       <div class="setting-item">
-        <button class="btn-replace-toggle" id="replaceToggleBtn">一括置換</button>
+        <button class="btn-replace-toggle" id="replaceToggleBtn">文字の一括置換</button>
       </div>
       <div class="setting-item" id="loaderMsg" style="display:none">
         <span class="loader-text">読み込み中...</span>
@@ -149,6 +184,54 @@
 
   <!-- Ad: Bottom banner -->
   <div class="ad-slot ad-bottom" id="adBottom"></div>
+
+  <!-- About / SEO content -->
+  <section class="info-section">
+    <div class="info-inner">
+      <h2>SubLineについて</h2>
+      <p>SubLineは、動画の字幕・テロップ作りに特化した日本語自動改行ツールです。Googleが開発したオープンソースの分かち書きエンジン<strong>BudouX</strong>を搭載し、文の意味の切れ目を判定して、指定した最大文字数内で読みやすく改行します。</p>
+
+      <h3>主な機能</h3>
+      <ul>
+        <li>最大文字数を指定して、AI（BudouX）が意味の切れ目で自動改行</li>
+        <li>句読点を文字数から除外するオプション</li>
+        <li>句読点削除・空白行削除・句読点を半角スペースに置換</li>
+        <li>「」『』を " " ' ' に一括変換</li>
+        <li>文字の一括置換</li>
+        <li>.txt / .csv / .srt / .vtt / .json への書き出し</li>
+        <li>文字数ルーラー表示で視認性◎</li>
+      </ul>
+
+      <h3>こんな方におすすめ</h3>
+      <ul>
+        <li>YouTube・TikTok・Instagram Reels の動画編集者</li>
+        <li>Premiere Pro / Final Cut Pro / DaVinci Resolve でテロップを作る方</li>
+        <li>セミナー・講演動画に字幕を入れる制作者</li>
+        <li>長文を読みやすく整形したいライター・編集者</li>
+      </ul>
+
+      <h3>使い方</h3>
+      <ol>
+        <li>左側のテキストエリアに原稿を貼り付け</li>
+        <li>最大文字数を設定（字幕は20〜30文字が一般的）</li>
+        <li>右側に自動改行された結果が表示されます</li>
+        <li>「コピー」または「書き出し」で結果を取得</li>
+      </ol>
+
+      <p class="info-note">完全無料・インストール不要・会員登録不要。すべての処理はブラウザ内で完結し、入力したテキストはサーバーに送信されません。</p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="privacy.html">プライバシーポリシー</a>
+        <a href="terms.html">利用規約</a>
+        <a href="contact.html">お問い合わせ</a>
+      </div>
+      <div class="footer-copy">© 2026 SubLine</div>
+    </div>
+  </footer>
 
   <script src="budoux.min.js"></script>
   <script src="app.js"></script>

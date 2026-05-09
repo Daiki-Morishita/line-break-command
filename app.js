@@ -3,8 +3,7 @@ const TARGET_PER_LINE = 22;
 const LONE_PARTICLES  = new Set([...'はがをのにでへとも']);
 
 // Practical recommended range for Japanese subtitles
-const WARN_MIN = 10;
-const WARN_MAX = 40;
+const WARN_MAX = 45;
 
 let parser           = null;
 let debounceTimer    = null;
@@ -60,7 +59,7 @@ function buildRulers(maxChars) {
 function bindEvents() {
   document.getElementById('inputText').addEventListener('input', scheduleProcess);
   document.getElementById('maxChars').addEventListener('input', () => {
-    const v = Math.max(5, parseInt(document.getElementById('maxChars').value) || 30);
+    const v = Math.max(5, parseInt(document.getElementById('maxChars').value) || 27);
     updateCharWarning(v);
     buildRulers(v);
     scheduleProcess();
@@ -133,11 +132,8 @@ function closeAllDropdowns() {
 
 function updateCharWarning(v) {
   const el = document.getElementById('charWarning');
-  if (v < WARN_MIN) {
-    el.textContent = `⚠ 1行${v}文字は短すぎる可能性があります。字幕・テロップには ${WARN_MIN}〜${WARN_MAX} 文字が適切です。`;
-    el.style.display = 'block';
-  } else if (v > WARN_MAX) {
-    el.textContent = `⚠ 1行${v}文字は長すぎる可能性があります。字幕・テロップには ${WARN_MIN}〜${WARN_MAX} 文字が適切です。`;
+  if (v > WARN_MAX) {
+    el.textContent = `⚠ 1行の文字数は${WARN_MAX}文字が最大です。`;
     el.style.display = 'block';
   } else {
     el.style.display = 'none';
@@ -465,7 +461,7 @@ function process() {
   if (!parser) return;
 
   const text     = document.getElementById('inputText').value;
-  const maxChars = Math.max(5, parseInt(document.getElementById('maxChars').value) || 30);
+  const maxChars = Math.max(5, parseInt(document.getElementById('maxChars').value) || 27);
   const rmPunct     = document.getElementById('removePunct').checked;
   const rmBlank     = document.getElementById('removeBlank').checked;
   const punctToSpace = document.getElementById('punctToSpace').checked;
@@ -496,7 +492,7 @@ function clearInput() {
 }
 
 function resetDefaults() {
-  document.getElementById('maxChars').value = 30;
+  document.getElementById('maxChars').value = 27;
   document.getElementById('removePunct').checked = false;
   document.getElementById('removeBlank').checked = false;
   document.getElementById('excludePunct').checked = true;
