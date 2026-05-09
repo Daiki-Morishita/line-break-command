@@ -359,10 +359,40 @@ function dpBreakChunks(chunks, maxChars) {
   return forceBreakChunks(chunks, maxChars);
 }
 
+// ・-chain of 3+ words (e.g. レイ・ダリオ・スタンレー): split at ・ boundaries,
+// placing ・ at the head of each subsequent word so DP can break there.
+// ひらがなを除外: 固有名詞（カタカナ・漢字・英字）の・連続のみ対象
+const NAKAGURO_CHAIN_RE = /[^\s・、。？！「」『』（）[\]()ぁ-ん]+(?:・[^\s・、。？！「」『』（）[\]()ぁ-ん]+){2,}/g;
+
 function processSentence(sentence, maxChars) {
   sentence = sentence.trim();
   if (!sentence) return [];
   if (effLen(sentence) <= maxChars) return [sentence];
+
+  NAKAGURO_CHAIN_RE.lastIndex = 0;
+  if (NAKAGURO_CHAIN_RE.test(sentence)) {
+    NAKAGURO_CHAIN_RE.lastIndex = 0;
+    const allChunks = [];
+    let lastIndex = 0;
+    let m;
+    while ((m = NAKAGURO_CHAIN_RE.exec(sentence)) !== null) {
+      if (m.index > lastIndex) {
+        allChunks.push(...getChunks(sentence.slice(lastIndex, m.index)));
+      }
+      const parts = m[0].split('・');
+      allChunks.push(parts[0]);
+      for (let i = 1; i < parts.length; i++) {
+        if (parts[i]) allChunks.push('・' + parts[i]);
+      }
+      lastIndex = m.index + m[0].length;
+    }
+    if (lastIndex < sentence.length) {
+      allChunks.push(...getChunks(sentence.slice(lastIndex)));
+    }
+    if (!allChunks.length) return [sentence];
+    return dpBreakChunks(allChunks, maxChars);
+  }
+
   const chunks = getChunks(sentence);
   if (!chunks.length) return [sentence];
   return dpBreakChunks(chunks, maxChars);
