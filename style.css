@@ -184,13 +184,13 @@ main {
 .editor-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 40px 1fr;
+  grid-template-columns: 1fr 56px 1fr;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow);
   overflow: hidden;
-  min-height: 360px;
+  min-height: 440px;
 }
 
 /* ── Pane ─────────────────────────────────────── */
@@ -215,13 +215,13 @@ main {
 /* Textarea */
 .editor-textarea {
   flex: 1;
-  padding: 14px 16px;
+  padding: 18px 20px;
   border: none;
   outline: none;
   resize: none;
   font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'YuGothic', sans-serif;
-  font-size: 14px;
-  line-height: 1.9;
+  font-size: 16px;
+  line-height: 2.1;
   color: var(--text);
   background: var(--surface);
   width: 100%;
@@ -271,7 +271,7 @@ main {
   border-right: 1px solid var(--border);
   background: var(--bg);
   color: var(--muted);
-  font-size: 22px;
+  font-size: 36px;
   font-weight: 300;
   user-select: none;
 }
@@ -532,7 +532,7 @@ main {
 
 /* ── Tablet (≤ 1024px): 設定バーが折り返してもエディタ高さを確保 ── */
 @media (max-width: 1024px) {
-  .editor-grid { min-height: 420px; }
+  .editor-grid { min-height: 480px; }
 }
 
 /* ── Mobile (≤ 760px) ─────────────────────────── */

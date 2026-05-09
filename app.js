@@ -59,7 +59,7 @@ function buildRulers(maxChars) {
 function bindEvents() {
   document.getElementById('inputText').addEventListener('input', scheduleProcess);
   document.getElementById('maxChars').addEventListener('input', () => {
-    const v = Math.max(5, parseInt(document.getElementById('maxChars').value) || 27);
+    const v = Math.min(45, Math.max(5, parseInt(document.getElementById('maxChars').value) || 27));
     updateCharWarning(v);
     buildRulers(v);
     scheduleProcess();
@@ -133,7 +133,7 @@ function closeAllDropdowns() {
 function updateCharWarning(v) {
   const el = document.getElementById('charWarning');
   if (v > WARN_MAX) {
-    el.textContent = `⚠ 1行の文字数は${WARN_MAX}文字が最大です。字幕の文字数は26〜28文字が一般的です。`;
+    el.textContent = `⚠ 1行の文字数は${WARN_MAX}文字が最大です。`;
     el.style.display = 'block';
   } else {
     el.style.display = 'none';
