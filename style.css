@@ -190,8 +190,7 @@ main {
   border-radius: var(--r-lg);
   box-shadow: var(--shadow);
   overflow: hidden;
-  min-height: 0;
-  height: calc(100vh - 192px);
+  min-height: 360px;
 }
 
 /* ── Pane ─────────────────────────────────────── */
@@ -519,9 +518,9 @@ main {
   font-weight: 700;
   margin: 28px 0 10px;
 }
-.static-page p { margin-bottom: 12px; line-height: 1.85; }
-.static-page ul { margin: 0 0 12px 22px; line-height: 1.85; }
-.static-page a { color: var(--accent); }
+.static-page p { margin-bottom: 12px; line-height: 1.85; word-wrap: break-word; }
+.static-page ul { margin: 0 0 12px 22px; line-height: 1.85; word-wrap: break-word; }
+.static-page a { color: var(--accent); word-break: break-all; }
 .static-page .back-link {
   display: inline-block;
   margin-top: 24px;
@@ -531,26 +530,44 @@ main {
 }
 .static-page .back-link:hover { text-decoration: underline; }
 
-/* ── Mobile ───────────────────────────────────── */
+/* ── Tablet (≤ 1024px): 設定バーが折り返してもエディタ高さを確保 ── */
+@media (max-width: 1024px) {
+  .editor-grid { min-height: 420px; }
+}
+
+/* ── Mobile (≤ 760px) ─────────────────────────── */
 @media (max-width: 760px) {
-  .info-section { padding: 32px 16px; }
-  .static-page { margin: 16px; padding: 24px 18px; }
-  .footer-inner { flex-direction: column; align-items: flex-start; }
-  main { padding: 10px 12px 14px; }
+  main { padding: 10px 12px 14px; min-height: 0; }
   .editor-grid {
     grid-template-columns: 1fr;
     grid-template-rows: 1fr 32px 1fr;
-    height: auto;
-    min-height: 520px;
+    min-height: 640px;
   }
-  .pane { min-height: 230px; }
+  .pane { min-height: 280px; }
   .divider {
     border-left: none; border-right: none;
     border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
     height: 32px;
+    font-size: 18px;
   }
-  .settings-bar { gap: 12px; }
+  .settings-bar { gap: 12px 16px; padding: 10px 14px; }
+  .setting-item > label:not(.switch) { font-size: 12px; }
   .tagline { display: none; }
   .header { padding: 0 14px; }
+
+  .info-section { padding: 32px 16px; }
+  .info-inner h2 { font-size: 19px; }
+  .info-inner h3 { font-size: 15px; }
+  .static-page { margin: 16px; padding: 24px 18px; }
+  .static-page h1 { font-size: 22px; }
+  .footer-inner { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+
+/* ── Small phone (≤ 380px) ────────────────────── */
+@media (max-width: 380px) {
+  .header { padding: 0 12px; }
+  .logo-text { font-size: 20px; }
+  .logo-icon { font-size: 22px; }
+  .settings-bar { padding: 8px 12px; gap: 10px 12px; }
 }
