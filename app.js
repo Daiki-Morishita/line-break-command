@@ -11,15 +11,17 @@ let excludePunctFlag = true;
 let charPixelWidth   = null;
 
 function measureCharWidth() {
+  const ta = document.getElementById('inputText');
+  const cs = getComputedStyle(ta);
   const probe = document.createElement('span');
   Object.assign(probe.style, {
     position:      'fixed',
     visibility:    'hidden',
     whiteSpace:    'nowrap',
-    fontFamily:    "'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP',YuGothic,sans-serif",
-    fontSize:      '14px',
-    fontWeight:    'normal',
-    letterSpacing: 'normal'
+    fontFamily:    cs.fontFamily,
+    fontSize:      cs.fontSize,
+    fontWeight:    cs.fontWeight,
+    letterSpacing: cs.letterSpacing,
   });
   probe.textContent = '一'.repeat(40);
   document.body.appendChild(probe);
@@ -42,14 +44,16 @@ window.addEventListener('load', () => {
 });
 
 function buildRulers(maxChars) {
-  if (!charPixelWidth) charPixelWidth = measureCharWidth();
-  const cw = charPixelWidth;
+  const cw = measureCharWidth();
+  charPixelWidth = cw;
+  const ta = document.getElementById('inputText');
+  const paddingLeft = parseFloat(getComputedStyle(ta).paddingLeft);
   const step = 5;
   const ticks = [];
   for (let i = step; i <= maxChars; i += step) ticks.push(i);
   if (ticks.at(-1) !== maxChars) ticks.push(maxChars);
   const html = ticks.map(n => {
-    const left = (16 + n * cw).toFixed(1) + 'px';
+    const left = (paddingLeft + n * cw).toFixed(1) + 'px';
     return `<span class="ruler-tick${n === maxChars ? ' ruler-max' : ''}" style="left:${left}">${n}</span>`;
   }).join('');
   document.getElementById('rulerLeft').innerHTML  = html;
