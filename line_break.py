@@ -67,7 +67,10 @@ def break_bonus(chunks: tuple[str, ...], j: int) -> int:
 
     if j < n:
         if chunks[j][0] == '「':
-            bonus -= 5   # 引用開始は自然な改行ポイント
+            prev_chunk = chunks[j - 1] if j > 0 else ''
+            is_demonstrative = (prev_chunk.endswith('この') or prev_chunk.endswith('その') or
+                                 prev_chunk.endswith('あの') or prev_chunk.endswith('どの'))
+            bonus += 8 if is_demonstrative else -5
         elif chunks[j][0] in _LONE_PARTICLES:
             bonus += 4   # 助詞で行頭はNG
 
@@ -81,7 +84,6 @@ def break_bonus(chunks: tuple[str, ...], j: int) -> int:
 def dp_break_chunks(
     chunks: list[str],
     max_chars: int = MAX_CHARS,
-    target_per_line: int = TARGET_PER_LINE,
 ) -> list[str]:
     """
     BudouXチャンクリストを max_chars 以内の行に分割。

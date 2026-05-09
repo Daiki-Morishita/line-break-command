@@ -95,7 +95,10 @@ function breakBonus(chunks, j) {
 
   if (j < n) {
     if (chunks[j][0] === '「') {
-      bonus -= 5;
+      const prev = j > 0 ? chunks[j - 1] : '';
+      const isDemonstrative = prev.endsWith('この') || prev.endsWith('その') ||
+                              prev.endsWith('あの') || prev.endsWith('どの');
+      bonus += isDemonstrative ? 8 : -5;
     } else if (LONE_PARTICLES.has(chunks[j][0])) {
       bonus += 4;
     }
