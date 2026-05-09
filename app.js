@@ -2,8 +2,9 @@
 const TARGET_PER_LINE = 22;
 const LONE_PARTICLES  = new Set([...'はがをのにでへとも']);
 
-let parser       = null;
-let debounceTimer = null;
+let parser          = null;
+let debounceTimer   = null;
+let excludePunctFlag = true; // default ON = current behavior (exclude 。and 、)
 
 // ── Init ───────────────────────────────────────
 window.addEventListener('load', () => {
@@ -23,9 +24,11 @@ function buildRulers(maxChars) {
   const ticks = [];
   for (let i = step; i <= maxChars; i += step) ticks.push(i);
   if (ticks.at(-1) !== maxChars) ticks.push(maxChars);
-  const html = ticks.map(n =>
-    `<span class="ruler-tick${n === maxChars ? ' ruler-max' : ''}">${n}</span>`
-  ).join('');
+  const html = ticks.map(n => {
+    const frac = (n / maxChars).toFixed(5);
+    const left = `calc(16px + ${frac} * (100% - 32px))`;
+    return `<span class="ruler-tick${n === maxChars ? ' ruler-max' : ''}" style="left:${left}">${n}</span>`;
+  }).join('');
   document.getElementById('rulerLeft').innerHTML  = html;
   document.getElementById('rulerRight').innerHTML = html;
 }
@@ -37,10 +40,17 @@ function bindEvents() {
     buildRulers(v);
     scheduleProcess();
   });
-  document.getElementById('removePunct').addEventListener('change', scheduleProcess);
-  document.getElementById('removeBlank').addEventListener('change', scheduleProcess);
-  document.getElementById('clearBtn').addEventListener('click',     clearInput);
-  document.getElementById('copyBtn').addEventListener('click',      copyOutput);
+  document.getElementById('removePunct').addEventListener('change',  scheduleProcess);
+  document.getElementById('removeBlank').addEventListener('change',  scheduleProcess);
+  document.getElementById('excludePunct').addEventListener('change', scheduleProcess);
+  document.getElementById('clearBtn').addEventListener('click',      clearInput);
+  document.getElementById('copyBtn').addEventListener('click',       copyOutput);
+  document.getElementById('replaceToggleBtn').addEventListener('click', toggleReplaceBar);
+  document.getElementById('closeReplaceBtn').addEventListener('click',  () => toggleReplaceBar(false));
+  document.getElementById('replaceBtn').addEventListener('click',        applyReplace);
+  document.getElementById('findText').addEventListener('keydown',   e => { if (e.key === 'Enter') applyReplace(); });
+  document.getElementById('replaceText').addEventListener('keydown', e => { if (e.key === 'Enter') applyReplace(); });
+  document.getElementById('quoteBtn').addEventListener('click',     convertQuotes);
   buildRulers(30);
 }
 
@@ -53,7 +63,10 @@ function scheduleProcess() {
 
 function effLen(s) {
   let n = 0;
-  for (const c of s) if (c !== '、' && c !== '。') n++;
+  for (const c of s) {
+    if (excludePunctFlag && (c === '、' || c === '。')) continue;
+    n++;
+  }
   return n;
 }
 
@@ -302,6 +315,8 @@ function process() {
   const rmPunct   = document.getElementById('removePunct').checked;
   const rmBlank   = document.getElementById('removeBlank').checked;
 
+  excludePunctFlag = document.getElementById('excludePunct').checked;
+
   const inputLen = [...text].filter(c => c.trim()).length;
   document.getElementById('inputCount').textContent = `${inputLen.toLocaleString()}文字`;
 
@@ -323,6 +338,38 @@ function clearInput() {
   document.getElementById('inputText').value = '';
   process();
   document.getElementById('inputText').focus();
+}
+
+function toggleReplaceBar(show) {
+  const bar = document.getElementById('replaceBar');
+  const btn = document.getElementById('replaceToggleBtn');
+  const isVisible = bar.style.display !== 'none';
+  const shouldShow = show !== undefined ? show : !isVisible;
+  bar.style.display = shouldShow ? 'flex' : 'none';
+  btn.classList.toggle('active', shouldShow);
+  if (shouldShow) document.getElementById('findText').focus();
+}
+
+function applyReplace() {
+  const find = document.getElementById('findText').value;
+  const replaceWith = document.getElementById('replaceText').value;
+  if (!find) return;
+  const ta = document.getElementById('inputText');
+  const escaped = find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  ta.value = ta.value.replace(new RegExp(escaped, 'g'), replaceWith);
+  const btn = document.getElementById('replaceBtn');
+  btn.textContent = '置換済み ✓';
+  btn.classList.add('done');
+  setTimeout(() => { btn.textContent = '全て置換'; btn.classList.remove('done'); }, 1500);
+  scheduleProcess();
+}
+
+function convertQuotes() {
+  const ta = document.getElementById('outputText');
+  if (!ta.value) return;
+  ta.value = ta.value.replace(/「/g, '"').replace(/」/g, '"');
+  const lineCount = ta.value.split('\n').filter(l => l.trim()).length;
+  document.getElementById('outputCount').textContent = `${lineCount.toLocaleString()}行`;
 }
 
 async function copyOutput() {

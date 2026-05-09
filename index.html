@@ -45,9 +45,28 @@
           <span>空白行削除</span>
         </label>
       </div>
+      <div class="setting-item">
+        <label class="switch">
+          <input type="checkbox" id="excludePunct" checked>
+          <span class="slider"></span>
+          <span>句読点を文字数から除外</span>
+        </label>
+      </div>
+      <div class="setting-item">
+        <button class="btn-replace-toggle" id="replaceToggleBtn">一括置換</button>
+      </div>
       <div class="setting-item" id="loaderMsg" style="display:none">
         <span class="loader-text">読み込み中...</span>
       </div>
+    </div>
+
+    <div class="replace-bar" id="replaceBar" style="display:none">
+      <span class="replace-label">一括置換</span>
+      <input type="text" id="findText" placeholder="検索テキスト" class="replace-input">
+      <span class="replace-arrow">→</span>
+      <input type="text" id="replaceText" placeholder="置換テキスト" class="replace-input">
+      <button class="btn-replace" id="replaceBtn">全て置換</button>
+      <button class="btn-replace-close" id="closeReplaceBtn">✕</button>
     </div>
 
     <div class="editor-grid">
@@ -80,6 +99,7 @@
           <span class="pane-title">アフター</span>
           <div class="pane-meta">
             <span class="meta-text" id="outputCount">0行</span>
+            <button class="btn-quote" id="quoteBtn">「」→ ""</button>
             <button class="btn-copy" id="copyBtn">コピー</button>
           </div>
         </div>

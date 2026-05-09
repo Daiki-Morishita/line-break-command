@@ -214,21 +214,24 @@ main {
 
 /* ── Ruler ────────────────────────────────────── */
 .ruler {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 3px 16px;
+  position: relative;
+  height: 22px;
+  padding: 0 16px;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   user-select: none;
+  overflow: hidden;
 }
 .ruler-tick {
+  position: absolute;
+  top: 2px;
   font-size: 10px;
   color: #bbb;
   font-variant-numeric: tabular-nums;
   letter-spacing: -.2px;
-  position: relative;
+  transform: translateX(-50%);
+  white-space: nowrap;
 }
 .ruler-tick::before {
   content: '';
@@ -258,6 +261,87 @@ main {
   user-select: none;
 }
 
+/* ── Replace bar ──────────────────────────────── */
+.replace-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 8px 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.replace-label {
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.replace-input {
+  flex: 1;
+  min-width: 120px;
+  max-width: 280px;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  outline: none;
+  transition: border-color var(--t);
+}
+.replace-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(91,78,248,.12); }
+.replace-input::placeholder { color: var(--muted); }
+.replace-arrow { color: var(--muted); font-size: 14px; flex-shrink: 0; }
+.btn-replace {
+  padding: 5px 14px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--t);
+  flex-shrink: 0;
+}
+.btn-replace:hover { background: var(--accent-h); }
+.btn-replace.done  { background: var(--success); }
+.btn-replace-close {
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  transition: all var(--t);
+  flex-shrink: 0;
+}
+.btn-replace-close:hover { background: var(--bg); color: var(--text); }
+.btn-replace-toggle {
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: inherit;
+  transition: all var(--t);
+  white-space: nowrap;
+}
+.btn-replace-toggle:hover { background: var(--bg); color: var(--text); border-color: #bbb; }
+.btn-replace-toggle.active { background: var(--accent); color: white; border-color: var(--accent); }
+
 /* ── Buttons ──────────────────────────────────── */
 .btn-clear, .btn-copy {
   padding: 4px 10px;
@@ -279,6 +363,19 @@ main {
 }
 .btn-copy:hover  { background: var(--accent-h); border-color: var(--accent-h); }
 .btn-copy.copied { background: var(--success); border-color: var(--success); }
+.btn-quote {
+  padding: 4px 10px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--t);
+  white-space: nowrap;
+  background: transparent;
+  color: var(--muted);
+}
+.btn-quote:hover { background: var(--bg); color: var(--text); border-color: #bbb; }
 
 /* ── Footer ───────────────────────────────────── */
 footer {
