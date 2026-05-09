@@ -242,6 +242,8 @@ function breakBonus(chunks, j) {
       bonus -= 1;
     } else if (prev.endsWith('て') || prev.endsWith('で')) {
       bonus -= 1;
+    } else if (prev.endsWith('と') && j < chunks.length && /^いった|^いう|^いわ/.test(chunks[j])) {
+      bonus += 8;
     }
   }
 
