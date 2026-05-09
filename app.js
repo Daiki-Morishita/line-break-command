@@ -2,10 +2,14 @@
 const TARGET_PER_LINE = 22;
 const LONE_PARTICLES  = new Set([...'はがをのにでへとも']);
 
+// Practical recommended range for Japanese subtitles
+const WARN_MIN = 10;
+const WARN_MAX = 40;
+
 let parser           = null;
 let debounceTimer    = null;
-let excludePunctFlag = true; // default ON = current behavior (exclude 。and 、)
-let charPixelWidth   = null; // measured width of one full-width CJK char in textarea font
+let excludePunctFlag = true;
+let charPixelWidth   = null;
 
 function measureCharWidth() {
   const probe = document.createElement('span');
@@ -45,7 +49,6 @@ function buildRulers(maxChars) {
   const ticks = [];
   for (let i = step; i <= maxChars; i += step) ticks.push(i);
   if (ticks.at(-1) !== maxChars) ticks.push(maxChars);
-  // Position each tick at: textarea left-padding (16px) + n × actual char width
   const html = ticks.map(n => {
     const left = (16 + n * cw).toFixed(1) + 'px';
     return `<span class="ruler-tick${n === maxChars ? ' ruler-max' : ''}" style="left:${left}">${n}</span>`;
@@ -55,9 +58,10 @@ function buildRulers(maxChars) {
 }
 
 function bindEvents() {
-  document.getElementById('inputText').addEventListener('input',    scheduleProcess);
+  document.getElementById('inputText').addEventListener('input', scheduleProcess);
   document.getElementById('maxChars').addEventListener('input', () => {
-    const v = Math.max(10, parseInt(document.getElementById('maxChars').value) || 30);
+    const v = Math.max(5, parseInt(document.getElementById('maxChars').value) || 30);
+    updateCharWarning(v);
     buildRulers(v);
     scheduleProcess();
   });
@@ -69,15 +73,75 @@ function bindEvents() {
   document.getElementById('replaceToggleBtn').addEventListener('click', toggleReplaceBar);
   document.getElementById('closeReplaceBtn').addEventListener('click',  () => toggleReplaceBar(false));
   document.getElementById('replaceBtn').addEventListener('click',        applyReplace);
-  document.getElementById('findText').addEventListener('keydown',   e => { if (e.key === 'Enter') applyReplace(); });
-  document.getElementById('replaceText').addEventListener('keydown', e => { if (e.key === 'Enter') applyReplace(); });
-  document.getElementById('quoteBtn').addEventListener('click',     convertQuotes);
+  document.getElementById('resetBtn').addEventListener('click', resetDefaults);
+  document.getElementById('punctToSpace').addEventListener('change', scheduleProcess);
+
+  // Quote dropdown
+  document.getElementById('quoteBtnToggle').addEventListener('click', e => {
+    e.stopPropagation();
+    toggleDropdown('quoteMenu');
+  });
+  document.querySelectorAll('#quoteMenu .dropdown-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      convertQuotes(btn.dataset.quote);
+      closeAllDropdowns();
+    });
+  });
+
+  // Export dropdown
+  document.getElementById('exportBtnToggle').addEventListener('click', e => {
+    e.stopPropagation();
+    toggleDropdown('exportMenu');
+  });
+  document.querySelectorAll('#exportMenu .dropdown-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      exportOutput(btn.dataset.format);
+      closeAllDropdowns();
+    });
+  });
+
+  document.addEventListener('click', closeAllDropdowns);
+
   buildRulers(30);
+  updateCharWarning(30);
 }
 
 function scheduleProcess() {
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(process, 120);
+}
+
+// ── Dropdown ───────────────────────────────────
+
+function toggleDropdown(menuId) {
+  const menu = document.getElementById(menuId);
+  const isOpen = menu.classList.contains('open');
+  closeAllDropdowns();
+  if (!isOpen) {
+    menu.classList.add('open');
+    const btn = menu.previousElementSibling;
+    if (btn) btn.classList.add('open');
+  }
+}
+
+function closeAllDropdowns() {
+  document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('open'));
+  document.querySelectorAll('.btn-quote, .btn-export').forEach(b => b.classList.remove('open'));
+}
+
+// ── Char warning ───────────────────────────────
+
+function updateCharWarning(v) {
+  const el = document.getElementById('charWarning');
+  if (v < WARN_MIN) {
+    el.textContent = `⚠ 1行${v}文字は短すぎる可能性があります。字幕・テロップには ${WARN_MIN}〜${WARN_MAX} 文字が適切です。`;
+    el.style.display = 'block';
+  } else if (v > WARN_MAX) {
+    el.textContent = `⚠ 1行${v}文字は長すぎる可能性があります。字幕・テロップには ${WARN_MIN}〜${WARN_MAX} 文字が適切です。`;
+    el.style.display = 'block';
+  } else {
+    el.style.display = 'none';
+  }
 }
 
 // ── Algorithm ──────────────────────────────────
@@ -97,6 +161,15 @@ function getChunks(text) {
   try { return parser.parse(text); } catch { return [text]; }
 }
 
+// Returns true when a 「」 content looks like direct speech (isolate it)
+function isSpeechQuote(content) {
+  if (content.length <= 6) return false;
+  // Technical terms / loanwords ending with closing bracket → don't isolate
+  if (/[）\]｝》〉\)]$/.test(content)) return false;
+  // Predicate/sentence-final endings → isolate
+  return /[たださよねわぞぜかなう。？！]$/.test(content);
+}
+
 function breakBonus(chunks, j) {
   const n = chunks.length;
   let bonus = 0;
@@ -106,7 +179,6 @@ function breakBonus(chunks, j) {
     if (prev.endsWith('たら') || prev.endsWith('れば')) {
       bonus -= 7;
     } else if (prev.endsWith('、')) {
-      // suppress inside 「…」
       let depth = 0;
       for (let k = 0; k < j; k++)
         for (const c of chunks[k]) {
@@ -170,7 +242,6 @@ function searchNLines(chunks, cumeff, n, nLines, maxChars) {
         const curBonus = bb + subBonus;
         let   curAdj   = curRaw + curBonus;
 
-        // Penalty: line ending with unclosed 「
         let openQ = 0;
         for (let k = start; k < end; k++)
           for (const c of chunks[k]) {
@@ -251,7 +322,6 @@ function processSentence(sentence, maxChars) {
 
 function splitBySentence(text, maxChars) {
   const lines = [];
-  // Split after 。？！ — each becomes its own sentence unit
   const sentences = text.trim().split(/(?<=[。？！])/).filter(s => s.trim());
   for (const sent of sentences) {
     const hasMaru = sent.endsWith('。');
@@ -265,6 +335,70 @@ function splitBySentence(text, maxChars) {
   return lines;
 }
 
+// Split paragraph at speech-quote boundaries and isolate each quote as own line(s)
+function processParagraphWithQuotes(para, maxChars) {
+  const re = /「([^」]*)」/g;
+  let lastEnd = 0;
+  let match;
+  const segments = [];
+
+  while ((match = re.exec(para)) !== null) {
+    const before = para.slice(lastEnd, match.index);
+    if (before) segments.push({ type: 'text', value: before });
+
+    const content = match[1];
+    if (isSpeechQuote(content)) {
+      segments.push({ type: 'speech', value: match[0], content });
+    } else {
+      segments.push({ type: 'text', value: match[0] });
+    }
+    lastEnd = match.index + match[0].length;
+  }
+
+  const tail = para.slice(lastEnd);
+  if (tail) segments.push({ type: 'text', value: tail });
+
+  // No speech quotes → normal processing
+  if (!segments.some(s => s.type === 'speech')) {
+    return splitBySentence(para, maxChars);
+  }
+
+  const lines = [];
+  let textBuf = '';
+
+  for (const seg of segments) {
+    if (seg.type === 'text') {
+      textBuf += seg.value;
+    } else {
+      // Flush accumulated text first
+      if (textBuf.trim()) {
+        lines.push(...splitBySentence(textBuf.trim(), maxChars));
+        textBuf = '';
+      }
+      // Output the speech quote as its own line(s)
+      if (effLen(seg.value) <= maxChars) {
+        lines.push(seg.value);
+      } else {
+        // Break long quote: attach 「 to first part and 」 to last part
+        const innerChunks = getChunks(seg.content);
+        const broken = dpBreakChunks(innerChunks, maxChars - 1);
+        broken.forEach((part, i) => {
+          if (broken.length === 1)      lines.push('「' + part + '」');
+          else if (i === 0)              lines.push('「' + part);
+          else if (i === broken.length - 1) lines.push(part + '」');
+          else                           lines.push(part);
+        });
+      }
+    }
+  }
+
+  if (textBuf.trim()) {
+    lines.push(...splitBySentence(textBuf.trim(), maxChars));
+  }
+
+  return lines;
+}
+
 function processAnnotated(para, maxChars) {
   const lines = [];
   for (let part of para.split(/(?=✔)/)) {
@@ -275,12 +409,12 @@ function processAnnotated(para, maxChars) {
       const m = core.match(/^(✔[︎\s]*\S+(?:ない|する|いる|れる|された|ます|です|だ|い))\s+(.*)/);
       if (m) {
         if (m[1].trim()) lines.push(...processSentence(m[1].trim(), maxChars));
-        if (m[2].trim()) lines.push(...splitBySentence(m[2].trim(), maxChars));
+        if (m[2].trim()) lines.push(...processParagraphWithQuotes(m[2].trim(), maxChars));
       } else {
-        lines.push(...splitBySentence(core, maxChars));
+        lines.push(...processParagraphWithQuotes(core, maxChars));
       }
     } else {
-      lines.push(...splitBySentence(part, maxChars));
+      lines.push(...processParagraphWithQuotes(part, maxChars));
     }
   }
   return lines;
@@ -289,7 +423,7 @@ function processAnnotated(para, maxChars) {
 function processParagraph(para, maxChars) {
   if (!para.trim()) return [];
   if (/[✔※●▶]/.test(para)) return processAnnotated(para, maxChars);
-  return splitBySentence(para, maxChars);
+  return processParagraphWithQuotes(para, maxChars);
 }
 
 function stage1Linebreak(text, maxChars) {
@@ -299,8 +433,6 @@ function stage1Linebreak(text, maxChars) {
     const rawLines = block.trim().split('\n').map(l => l.trim()).filter(Boolean);
     if (!rawLines.length) { result.push(''); continue; }
 
-    // ASCII-only lines (e.g. speaker names like "Masa") stay standalone.
-    // All other consecutive lines are joined so the DP can optimize globally.
     const groups = [];
     let buf = null;
     for (const line of rawLines) {
@@ -320,9 +452,10 @@ function stage1Linebreak(text, maxChars) {
   return result.join('\n');
 }
 
-function stage2Finalize(text, removePunct, removeBlank) {
-  if (removePunct) text = text.replace(/[。、]/g, '');
-  if (removeBlank) text = text.split('\n').filter(l => l.trim()).join('\n');
+function stage2Finalize(text, removePunct, removeBlank, punctToSpace) {
+  if (punctToSpace) text = text.replace(/、/g, ' ');
+  if (removePunct)  text = text.replace(/[。、]/g, '');
+  if (removeBlank)  text = text.split('\n').filter(l => l.trim()).join('\n');
   return text;
 }
 
@@ -331,10 +464,11 @@ function stage2Finalize(text, removePunct, removeBlank) {
 function process() {
   if (!parser) return;
 
-  const text      = document.getElementById('inputText').value;
-  const maxChars  = Math.max(10, parseInt(document.getElementById('maxChars').value) || 30);
-  const rmPunct   = document.getElementById('removePunct').checked;
-  const rmBlank   = document.getElementById('removeBlank').checked;
+  const text     = document.getElementById('inputText').value;
+  const maxChars = Math.max(5, parseInt(document.getElementById('maxChars').value) || 30);
+  const rmPunct     = document.getElementById('removePunct').checked;
+  const rmBlank     = document.getElementById('removeBlank').checked;
+  const punctToSpace = document.getElementById('punctToSpace').checked;
 
   excludePunctFlag = document.getElementById('excludePunct').checked;
 
@@ -348,7 +482,7 @@ function process() {
   }
 
   let result = stage1Linebreak(text, maxChars);
-  if (rmPunct || rmBlank) result = stage2Finalize(result, rmPunct, rmBlank);
+  if (rmPunct || rmBlank || punctToSpace) result = stage2Finalize(result, rmPunct, rmBlank, punctToSpace);
 
   document.getElementById('outputText').value = result;
   const lineCount = result.split('\n').filter(l => l.trim()).length;
@@ -360,6 +494,19 @@ function clearInput() {
   process();
   document.getElementById('inputText').focus();
 }
+
+function resetDefaults() {
+  document.getElementById('maxChars').value = 30;
+  document.getElementById('removePunct').checked = false;
+  document.getElementById('removeBlank').checked = false;
+  document.getElementById('excludePunct').checked = true;
+  document.getElementById('punctToSpace').checked = false;
+  toggleReplaceBar(false);
+  buildRulers(30);
+  updateCharWarning(30);
+  process();
+}
+
 
 function toggleReplaceBar(show) {
   const bar = document.getElementById('replaceBar');
@@ -385,12 +532,79 @@ function applyReplace() {
   scheduleProcess();
 }
 
-function convertQuotes() {
+function convertQuotes(type) {
   const ta = document.getElementById('outputText');
   if (!ta.value) return;
-  ta.value = ta.value.replace(/「/g, '"').replace(/」/g, '"');
+  switch (type) {
+    case 'kagi-double':   ta.value = ta.value.replace(/「/g, '“').replace(/」/g, '”'); break;
+    case 'kagi-single':   ta.value = ta.value.replace(/「/g, '‘').replace(/」/g, '’'); break;
+    case 'kakko-double':  ta.value = ta.value.replace(/『/g, '“').replace(/』/g, '”'); break;
+    case 'kakko-single':  ta.value = ta.value.replace(/『/g, '‘').replace(/』/g, '’'); break;
+  }
   const lineCount = ta.value.split('\n').filter(l => l.trim()).length;
   document.getElementById('outputCount').textContent = `${lineCount.toLocaleString()}行`;
+}
+
+// ── Export ─────────────────────────────────────
+
+function formatSRTTime(seconds) {
+  const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+  const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+  const s = String(seconds % 60).padStart(2, '0');
+  return `${h}:${m}:${s},000`;
+}
+
+function formatVTTTime(seconds) {
+  const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+  const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+  const s = String(seconds % 60).padStart(2, '0');
+  return `${h}:${m}:${s}.000`;
+}
+
+function exportOutput(format) {
+  const text = document.getElementById('outputText').value;
+  if (!text.trim()) return;
+
+  const lines = text.split('\n').filter(l => l.trim());
+  let content = '';
+  let mime = 'text/plain';
+
+  switch (format) {
+    case 'txt':
+      content = text;
+      break;
+    case 'csv':
+      content = lines.map(l => `"${l.replace(/"/g, '""')}"`).join('\n');
+      mime = 'text/csv';
+      break;
+    case 'srt':
+      content = lines.map((l, i) => {
+        const start = formatSRTTime(i * 2);
+        const end   = formatSRTTime(i * 2 + 2);
+        return `${i + 1}\n${start} --> ${end}\n${l}`;
+      }).join('\n\n');
+      break;
+    case 'vtt':
+      content = 'WEBVTT\n\n' + lines.map((l, i) => {
+        const start = formatVTTTime(i * 2);
+        const end   = formatVTTTime(i * 2 + 2);
+        return `${start} --> ${end}\n${l}`;
+      }).join('\n\n');
+      break;
+    case 'json':
+      content = JSON.stringify(lines, null, 2);
+      mime = 'application/json';
+      break;
+  }
+
+  const bom  = format === 'csv' ? '﻿' : '';
+  const blob = new Blob([bom + content], { type: `${mime};charset=utf-8` });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `subtitles.${format}`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 async function copyOutput() {

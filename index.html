@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SubLine – 字幕自動改行ツール</title>
-  <meta name="description" content="動画字幕の自然な改行を自動生成。BudouX AI搭載で最大文字数内で読みやすく分割します。">
+  <meta name="description" content="日本語字幕・テロップ作り専用の自動改行ツール。BudouX AI搭載で最大文字数内で読みやすく分割します。">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,7 +15,7 @@
         <span class="logo-icon">↵</span>
         <span class="logo-text">SubLine</span>
       </div>
-      <span class="tagline">動画字幕専用の自動改行ツール</span>
+      <span class="tagline">日本語字幕・テロップ作り専用の自動改行ツール</span>
     </div>
   </header>
 
@@ -27,7 +27,7 @@
       <div class="setting-item">
         <label for="maxChars">最大文字数</label>
         <div class="input-with-unit">
-          <input type="number" id="maxChars" value="30" min="10" max="60">
+          <input type="number" id="maxChars" value="30" min="5" max="60">
           <span>文字</span>
         </div>
       </div>
@@ -53,12 +53,21 @@
         </label>
       </div>
       <div class="setting-item">
+        <label class="switch">
+          <input type="checkbox" id="punctToSpace">
+          <span class="slider"></span>
+          <span>句読点「、」を半角スペースに置換</span>
+        </label>
+      </div>
+      <div class="setting-item">
         <button class="btn-replace-toggle" id="replaceToggleBtn">一括置換</button>
       </div>
       <div class="setting-item" id="loaderMsg" style="display:none">
         <span class="loader-text">読み込み中...</span>
       </div>
     </div>
+
+    <div id="charWarning" class="char-warning" style="display:none"></div>
 
     <div class="replace-bar" id="replaceBar" style="display:none">
       <span class="replace-label">一括置換</span>
@@ -73,7 +82,7 @@
       <!-- Left pane: Before -->
       <div class="pane">
         <div class="pane-header">
-          <span class="pane-title">ビフォー</span>
+          <span class="pane-title">元の文章</span>
           <div class="pane-meta">
             <span class="meta-text" id="inputCount">0文字</span>
             <button class="btn-clear" id="clearBtn">クリア</button>
@@ -96,11 +105,35 @@
       <!-- Right pane: After -->
       <div class="pane">
         <div class="pane-header">
-          <span class="pane-title">アフター</span>
+          <span class="pane-title">変換後</span>
           <div class="pane-meta">
             <span class="meta-text" id="outputCount">0行</span>
-            <button class="btn-quote" id="quoteBtn">「」→ ""</button>
+            <button class="btn-clear" id="resetBtn">リセット</button>
+
+            <!-- Quote conversion dropdown -->
+            <div class="dropdown" id="quoteDropdown">
+              <button class="btn-quote" id="quoteBtnToggle">引用符変換 ▾</button>
+              <div class="dropdown-menu" id="quoteMenu">
+                <button class="dropdown-item" data-quote="kagi-double">「 」→ " "　ダブルクォート</button>
+                <button class="dropdown-item" data-quote="kagi-single">「 」→ ' '　シングルクォート</button>
+                <button class="dropdown-item" data-quote="kakko-double">『 』→ " "　ダブルクォート</button>
+                <button class="dropdown-item" data-quote="kakko-single">『 』→ ' '　シングルクォート</button>
+              </div>
+            </div>
+
             <button class="btn-copy" id="copyBtn">コピー</button>
+
+            <!-- Export dropdown -->
+            <div class="dropdown" id="exportDropdown">
+              <button class="btn-export" id="exportBtnToggle">書き出し ▾</button>
+              <div class="dropdown-menu" id="exportMenu">
+                <button class="dropdown-item" data-format="txt">.txt　プレーンテキスト</button>
+                <button class="dropdown-item" data-format="csv">.csv　CSV（1行1セル）</button>
+                <button class="dropdown-item" data-format="srt">.srt　SRT字幕</button>
+                <button class="dropdown-item" data-format="vtt">.vtt　WebVTT字幕</button>
+                <button class="dropdown-item" data-format="json">.json　JSON配列</button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="ruler" id="rulerRight"></div>
@@ -116,12 +149,6 @@
 
   <!-- Ad: Bottom banner -->
   <div class="ad-slot ad-bottom" id="adBottom"></div>
-
-  <footer>
-    <span>Powered by <a href="https://github.com/google/budoux" target="_blank" rel="noopener">BudouX</a></span>
-    <span class="footer-sep">·</span>
-    <a href="https://github.com/Daiki-Morishita/line-break-command" target="_blank" rel="noopener">GitHub</a>
-  </footer>
 
   <script src="budoux.min.js"></script>
   <script src="app.js"></script>
