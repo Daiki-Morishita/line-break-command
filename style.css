@@ -343,13 +343,13 @@ main {
 }
 .btn-replace-close:hover { background: var(--bg); color: var(--text); }
 .btn-replace-toggle {
-  padding: 5px 12px;
+  padding: 4px 10px;
   background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
   color: var(--muted);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 12px;
   font-family: inherit;
   transition: all var(--t);
   white-space: nowrap;
