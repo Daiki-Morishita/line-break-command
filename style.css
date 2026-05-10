@@ -460,6 +460,16 @@ main {
 .info-inner p { margin-bottom: 12px; line-height: 1.75; }
 .info-inner ul, .info-inner ol { margin: 0 0 12px 22px; line-height: 1.85; }
 .info-inner li { margin-bottom: 4px; }
+.info-faq dt {
+  font-weight: 700;
+  margin: 16px 0 4px;
+  color: var(--text);
+}
+.info-faq dd {
+  margin: 0 0 4px 0;
+  line-height: 1.75;
+  color: var(--text);
+}
 .info-inner .info-note {
   margin-top: 24px;
   padding: 14px 16px;
