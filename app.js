@@ -498,9 +498,62 @@ function processAnnotated(para, maxChars) {
   return lines;
 }
 
+// ※注釈は独立行として扱う。終端は接続詞/句点/別の※/文末で判定。
+const ANNOT_END_LOOKAHEAD =
+  /(?=しかし|しかも|ただし|また|なお|ところが|そして|ところで|つまり|ちなみに|要するに|そのため|したがって|それゆえ|それでも|それでは|ですが|でも|だが|だから|なぜなら|たとえば|例えば|具体的に|そこで|ところで|さて|では|それで|※|[。．？！\n]|$)/;
+
+function splitOnAsterisk(text) {
+  const result = [];
+  const re = new RegExp('※[^※]*?' + ANNOT_END_LOOKAHEAD.source, 'g');
+  let lastEnd = 0;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > lastEnd) {
+      const before = text.slice(lastEnd, m.index);
+      if (before.trim()) result.push(before);
+    }
+    const annot = m[0].trim();
+    if (annot && annot !== '※') result.push(annot);
+    lastEnd = m.index + m[0].length;
+    if (re.lastIndex <= m.index) re.lastIndex = m.index + 1;
+  }
+  if (lastEnd < text.length) {
+    const tail = text.slice(lastEnd);
+    if (tail.trim()) result.push(tail);
+  }
+  return result;
+}
+
 function processParagraph(para, maxChars) {
   if (!para.trim()) return [];
-  if (/[✔※●▶]/.test(para)) return processAnnotated(para, maxChars);
+
+  // ※を含む段落: ※注釈を独立行として切り出してから他を処理
+  if (para.includes('※')) {
+    const segs = splitOnAsterisk(para);
+    const lines = [];
+    for (const seg of segs) {
+      const s = seg.trim();
+      if (!s) continue;
+      if (s.startsWith('※')) {
+        if (effLen(s) <= maxChars) {
+          lines.push(s);
+        } else {
+          const chunks = getChunks(s);
+          lines.push(...dpBreakChunks(chunks, maxChars));
+        }
+      } else {
+        // ※を含まない断片: 通常処理（✔等は再帰）
+        if (/[✔●▶]/.test(s)) {
+          lines.push(...processAnnotated(s, maxChars));
+        } else {
+          lines.push(...processParagraphWithQuotes(s, maxChars));
+        }
+      }
+    }
+    return lines;
+  }
+
+  if (/[✔●▶]/.test(para)) return processAnnotated(para, maxChars);
   return processParagraphWithQuotes(para, maxChars);
 }
 
