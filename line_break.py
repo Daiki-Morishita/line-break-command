@@ -292,21 +292,12 @@ def stage1_linebreak(text: str, max_chars: int = MAX_CHARS) -> str:
         if not raw_lines:
             result.append('')
             continue
-        # ASCII-only lines and （）annotation blocks stay standalone;
-        # consecutive Japanese lines are joined so the DP can optimize globally.
+        # ASCII-only lines stay standalone; consecutive Japanese lines are joined
+        # so the DP can optimize the entire sentence globally.
         groups = []
         buf = None
-        in_paren = False
         for line in raw_lines:
-            if line.startswith('（') or in_paren:
-                in_paren = True
-                if buf:
-                    groups.append(buf)
-                    buf = None
-                groups.append(line)
-                if '）' in line:
-                    in_paren = False
-            elif all(ord(c) < 128 for c in line):
+            if all(ord(c) < 128 for c in line):
                 if buf:
                     groups.append(buf)
                     buf = None
