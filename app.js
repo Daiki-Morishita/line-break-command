@@ -569,8 +569,14 @@ function stage1Linebreak(text, maxChars) {
 
     const groups = [];
     let buf = null;
+    let inParen = false;
     for (const line of rawLines) {
-      if (/^[\x00-\x7F]+$/.test(line)) {
+      if (line.startsWith('（') || inParen) {
+        inParen = true;
+        if (buf) { groups.push(buf); buf = null; }
+        groups.push(line);
+        if (line.includes('）')) inParen = false;
+      } else if (/^[\x00-\x7F]+$/.test(line)) {
         if (buf) { groups.push(buf); buf = null; }
         groups.push(line);
       } else {
