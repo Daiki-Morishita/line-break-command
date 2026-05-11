@@ -222,7 +222,10 @@ function breakBonus(chunks, j) {
 
   if (j > 0) {
     const prev = chunks[j - 1];
-    if (prev.endsWith('たら') || prev.endsWith('れば')) {
+    // 文末（。．！？）は最強の改行候補
+    if (/[。．！？!?]$/.test(prev)) {
+      bonus -= 14;
+    } else if (prev.endsWith('たら') || prev.endsWith('れば')) {
       bonus -= 7;
     } else if (prev.endsWith('、')) {
       let depth = 0;
