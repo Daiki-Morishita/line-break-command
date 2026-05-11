@@ -569,7 +569,20 @@ function stage1Linebreak(text, maxChars) {
 
     const groups = [];
     let buf = null;
+    let inParenGroup = false;
     for (const line of rawLines) {
+      // （...）が複数行にまたがる場合: 各行を独立した注釈として保持
+      if (!inParenGroup && line.startsWith('（') && !line.includes('）')) {
+        if (buf) { groups.push(buf); buf = null; }
+        inParenGroup = true;
+        groups.push(line);
+        continue;
+      }
+      if (inParenGroup) {
+        groups.push(line);
+        if (line.includes('）')) inParenGroup = false;
+        continue;
+      }
       if (/^[\x00-\x7F]+$/.test(line)) {
         if (buf) { groups.push(buf); buf = null; }
         groups.push(line);
