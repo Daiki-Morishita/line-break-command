@@ -555,7 +555,27 @@ function processParagraph(para, maxChars) {
   return processParagraphWithQuotes(para, maxChars);
 }
 
+// 複数行にまたがる（...）を1行に結合（空白行も跨ぐ）
+function joinMultilineParens(text) {
+  const lines = text.split('\n');
+  const out = [];
+  let buf = null;
+  for (const line of lines) {
+    if (buf !== null) {
+      buf += line.trim();
+      if (line.includes('）')) { out.push(buf); buf = null; }
+    } else if (line.includes('（') && !line.includes('）')) {
+      buf = line.trim();
+    } else {
+      out.push(line);
+    }
+  }
+  if (buf !== null) out.push(buf);
+  return out.join('\n');
+}
+
 function stage1Linebreak(text, maxChars) {
+  text = joinMultilineParens(text);
   const result = [];
   const blocks = text.trim().split(/\n[ \t]*\n/);
   for (const block of blocks) {
@@ -564,20 +584,11 @@ function stage1Linebreak(text, maxChars) {
 
     const groups = [];
     let buf = null;
-    let parenBuf = null;
     for (const line of rawLines) {
-      // （...）が複数行にまたがる場合: 結合して1行の注釈として扱う
-      if (parenBuf === null && line.startsWith('（') && !line.includes('）')) {
+      // （...）で完結する注釈行は独立 noBreak グループ
+      if (line.startsWith('（') && line.endsWith('）')) {
         if (buf) { groups.push(buf); buf = null; }
-        parenBuf = line;
-        continue;
-      }
-      if (parenBuf !== null) {
-        parenBuf += line;
-        if (line.includes('）')) {
-          groups.push({type: 'noBreak', text: parenBuf});
-          parenBuf = null;
-        }
+        groups.push({type: 'noBreak', text: line});
         continue;
       }
       if (/^[\x00-\x7F]+$/.test(line)) {
@@ -587,7 +598,6 @@ function stage1Linebreak(text, maxChars) {
         buf = buf ? buf + line : line;
       }
     }
-    if (parenBuf !== null) groups.push({type: 'noBreak', text: parenBuf});
     if (buf) groups.push(buf);
 
     for (const g of groups) {
