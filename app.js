@@ -538,12 +538,7 @@ function processParagraph(para, maxChars) {
       const s = seg.trim();
       if (!s) continue;
       if (s.startsWith('※')) {
-        if (effLen(s) <= maxChars) {
-          lines.push(s);
-        } else {
-          const chunks = getChunks(s);
-          lines.push(...dpBreakChunks(chunks, maxChars));
-        }
+        lines.push(s);
       } else {
         // ※を含まない断片: 通常処理（✔等は再帰）
         if (/[✔●▶]/.test(s)) {
@@ -569,18 +564,20 @@ function stage1Linebreak(text, maxChars) {
 
     const groups = [];
     let buf = null;
-    let inParenGroup = false;
+    let parenBuf = null;
     for (const line of rawLines) {
-      // （...）が複数行にまたがる場合: 各行を独立した注釈として保持
-      if (!inParenGroup && line.startsWith('（') && !line.includes('）')) {
+      // （...）が複数行にまたがる場合: 結合して1行の注釈として扱う
+      if (parenBuf === null && line.startsWith('（') && !line.includes('）')) {
         if (buf) { groups.push(buf); buf = null; }
-        inParenGroup = true;
-        groups.push(line);
+        parenBuf = line;
         continue;
       }
-      if (inParenGroup) {
-        groups.push(line);
-        if (line.includes('）')) inParenGroup = false;
+      if (parenBuf !== null) {
+        parenBuf += line;
+        if (line.includes('）')) {
+          groups.push({type: 'noBreak', text: parenBuf});
+          parenBuf = null;
+        }
         continue;
       }
       if (/^[\x00-\x7F]+$/.test(line)) {
@@ -590,9 +587,16 @@ function stage1Linebreak(text, maxChars) {
         buf = buf ? buf + line : line;
       }
     }
+    if (parenBuf !== null) groups.push({type: 'noBreak', text: parenBuf});
     if (buf) groups.push(buf);
 
-    for (const g of groups) result.push(...processParagraph(g, maxChars));
+    for (const g of groups) {
+      if (typeof g === 'object' && g.type === 'noBreak') {
+        result.push(g.text);
+      } else {
+        result.push(...processParagraph(g, maxChars));
+      }
+    }
     result.push('');
   }
   while (result.length && result.at(-1) === '') result.pop();
