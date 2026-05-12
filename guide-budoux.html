@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BudouXとは？Google製の日本語分かち書きエンジンを解説 – SubLine</title>
+  <meta name="description" content="Googleが開発したオープンソースの日本語分かち書きライブラリ「BudouX」の仕組み・特徴・字幕作成に適している理由を解説します。従来の形態素解析との違いも紹介。">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://line-break-command.vercel.app/guide-budoux">
+  <link rel="stylesheet" href="style.css">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FKM6SXP7YE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FKM6SXP7YE');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4355731853778451" crossorigin="anonymous"></script>
+  <meta name="google-adsense-account" content="ca-pub-4355731853778451">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo" style="text-decoration:none">
+        <span class="logo-icon">↵</span>
+        <span class="logo-text">SubLine</span>
+      </a>
+      <span class="tagline">日本語字幕・テロップ作り専用の自動改行ツール</span>
+    </div>
+  </header>
+
+  <main>
+    <article class="static-page">
+      <h1>BudouXとは？Google製の日本語分かち書きエンジンを解説</h1>
+      <p class="updated">公開日：2026年5月12日</p>
+
+      <p>BudouX（ブドウエックス）は、Googleが開発・公開しているオープンソースの分かち書きライブラリです。日本語のように単語間に空白を入れない言語のテキストを、意味のまとまり（文節）ごとに区切る機能を提供します。本記事ではBudouXの仕組みと特徴、字幕作成への活用方法を詳しく解説します。</p>
+
+      <h2>BudouXの基本的な仕組み</h2>
+      <p>日本語の文章は、英語のように単語と単語の間にスペースが入りません。そのため、テキストを「読みやすい単位」で区切ろうとすると、どこで分けるべきかをコンピュータが判断する必要があります。BudouXは、機械学習モデルを使って文字と文字の境界における「区切りやすさ」を推定し、その確率に基づいて分割位置を決定します。</p>
+      <p>たとえば「今日は良い天気です」という文を、BudouXは「今日は／良い／天気です」のように分割できます。改行ポイントの候補としてこれらの区切りを使うことで、機械的に文字数だけで切るよりも自然な改行が実現します。</p>
+
+      <h2>形態素解析との違い</h2>
+      <p>従来、日本語処理でよく使われてきたのは「形態素解析」と呼ばれる手法です。MeCabやJanome、Sudachiといったライブラリが代表例で、文を品詞単位（名詞・動詞・助詞など）に細かく分解します。</p>
+      <p>形態素解析は精密な言語処理に強みがありますが、辞書データのサイズが大きく、ブラウザ上での動作には不向きでした。また、過度に細かく分けてしまうため、字幕やテロップのような「読みやすさ」を重視する用途には必ずしも適していません。</p>
+      <p>BudouXは形態素解析より粗い「文節レベル」の区切りに特化しており、辞書データを持たずに数十KB程度のモデルだけで動作します。これによりブラウザ上でも軽快に動作し、リアルタイムでテキストを処理できます。</p>
+
+      <h2>BudouXが字幕作成に適している理由</h2>
+
+      <h3>1. 軽量でブラウザ動作</h3>
+      <p>BudouXのJavaScript版はモデル込みでわずか数十KBです。これによりWebアプリケーション内に組み込んでも動作が重くならず、ユーザーが入力したテキストをリアルタイムで処理できます。サーバーへの通信が不要なため、プライバシーの観点でも優れています。</p>
+
+      <h3>2. 読みやすさを最優先</h3>
+      <p>BudouXのモデルは「人間がどこで改行すれば読みやすいか」を学習しており、字幕やテロップに使う改行位置の候補として最適化されています。技術的な正確さよりも視覚的な読みやすさを重視している点が、字幕作成と相性がよい理由です。</p>
+
+      <h3>3. 多言語対応</h3>
+      <p>BudouXは日本語だけでなく、中国語（簡体字・繁体字）、タイ語にも対応しています。これらの言語も単語の区切りが不明瞭なため、同じ手法で分かち書きが可能です。</p>
+
+      <h2>BudouXの使い方</h2>
+      <p>BudouXはJavaScript・Python・Swift・Java・Goなど複数のプログラミング言語で利用できます。GitHubで公開されているライブラリをプロジェクトに導入することで、自前のアプリケーションに組み込むことができます。</p>
+      <p>Webブラウザで使う場合は、CDN経由でスクリプトを読み込むだけで利用可能です。たとえば次のように書くだけで、日本語テキストの分かち書き結果を取得できます。</p>
+      <p>これらの機能を字幕作成に応用するには、分割後の文節を最大文字数内で組み合わせるアルゴリズムが必要です。SubLineではBudouXによる分割結果を、動的計画法（DP）で組み合わせ最適化することで、最大文字数を超えない範囲でなるべく長い行を作る設計になっています。</p>
+
+      <h2>SubLineにおけるBudouX活用</h2>
+      <p>SubLineはBudouXをブラウザ上で実行し、入力されたテキストをリアルタイムで分かち書きします。さらに、助詞が行頭にこないようなボーナス計算、鍵括弧内での改行抑制、固有名詞の中点（・）連続の検出など、独自の最適化ロジックを組み合わせることで、字幕として自然に読める出力を実現しています。</p>
+      <p>BudouX単体では「分割位置の候補」を提示するだけですが、SubLineはその上で「最大文字数内で最適な組み合わせ」を選択する役割を担います。ユーザーは原稿を貼り付けて最大文字数を指定するだけで、これらの処理が自動的に実行されます。</p>
+
+      <p><a href="index.html" class="back-link">← SubLineを使う</a></p>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="privacy.html">プライバシーポリシー</a>
+        <a href="terms.html">利用規約</a>
+        <a href="contact.html">お問い合わせ</a>
+      </div>
+      <div class="footer-copy">© 2026 SubLine</div>
+    </div>
+  </footer>
+
+</body>
+</html>

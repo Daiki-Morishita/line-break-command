@@ -6,6 +6,21 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://line-break-command.vercel.app/guide-subtitle-length</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://line-break-command.vercel.app/guide-youtube-subtitle</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://line-break-command.vercel.app/guide-budoux</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://line-break-command.vercel.app/privacy</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
