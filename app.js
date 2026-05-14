@@ -734,17 +734,10 @@ function generateFilename(text, format) {
     const d = counts[b] - counts[a];
     return d !== 0 ? d : b.length - a.length;
   });
-  // 包含関係の重複を避けて代表2語を選択
-  const picked = [];
-  for (const w of ranked) {
-    if (picked.some(p => p.includes(w) || w.includes(p))) continue;
-    picked.push(w);
-    if (picked.length >= 2) break;
-  }
-  const title = picked.join('_').replace(/[\/\\:*?"<>|]/g, '').slice(0, 24);
+  const word = (ranked[0] || '').replace(/[\/\\:*?"<>|]/g, '').slice(0, 16);
   const d = new Date();
   const ymd = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-  return title ? `${title}_${ymd}.${format}` : `subtitles_${ymd}.${format}`;
+  return word ? `SubLine_${word}_${ymd}.${format}` : `SubLine_${ymd}.${format}`;
 }
 
 function exportOutput(format) {
