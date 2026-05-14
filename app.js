@@ -723,7 +723,6 @@ function formatVTTTime(seconds) {
 }
 
 function generateFilename(text, format) {
-  // カタカナ・漢字の2文字以上、英数字3文字以上を単語として抽出
   const tokens = [
     ...(text.match(/[ァ-ヴー]{2,}/g) || []),
     ...(text.match(/[一-龯]{2,}/g) || []),
@@ -735,16 +734,14 @@ function generateFilename(text, format) {
     const d = counts[b] - counts[a];
     return d !== 0 ? d : b.length - a.length;
   });
-  // 上位の単語を24文字以内に収める範囲で連結
+  // 包含関係の重複を避けて代表2語を選択
   const picked = [];
-  let total = 0;
   for (const w of ranked) {
-    if (total + w.length + (picked.length ? 1 : 0) > 24) break;
+    if (picked.some(p => p.includes(w) || w.includes(p))) continue;
     picked.push(w);
-    total += w.length + (picked.length > 1 ? 1 : 0);
-    if (picked.length >= 3) break;
+    if (picked.length >= 2) break;
   }
-  const title = picked.join('_').replace(/[\/\\:*?"<>|]/g, '');
+  const title = picked.join('_').replace(/[\/\\:*?"<>|]/g, '').slice(0, 24);
   return title ? `${title}.${format}` : `subtitles.${format}`;
 }
 
