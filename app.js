@@ -742,7 +742,9 @@ function generateFilename(text, format) {
     if (picked.length >= 2) break;
   }
   const title = picked.join('_').replace(/[\/\\:*?"<>|]/g, '').slice(0, 24);
-  return title ? `${title}.${format}` : `subtitles.${format}`;
+  const d = new Date();
+  const ymd = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  return title ? `${title}_${ymd}.${format}` : `subtitles_${ymd}.${format}`;
 }
 
 function exportOutput(format) {
