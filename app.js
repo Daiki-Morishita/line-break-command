@@ -658,8 +658,8 @@ function clearInput() {
 
 function resetDefaults() {
   document.getElementById('maxChars').value = 27;
-  document.getElementById('removePunct').checked = false;
-  document.getElementById('removeBlank').checked = false;
+  document.getElementById('removePunct').checked = true;
+  document.getElementById('removeBlank').checked = true;
   document.getElementById('excludePunct').checked = true;
   document.getElementById('punctToSpace').checked = false;
   toggleReplaceBar(false);
