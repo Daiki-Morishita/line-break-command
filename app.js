@@ -722,6 +722,22 @@ function formatVTTTime(seconds) {
   return `${h}:${m}:${s}.000`;
 }
 
+function generateFilename(text, format) {
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  let title = '';
+  for (const line of lines) {
+    if (line.length >= 8) { title = line; break; }
+  }
+  if (!title && lines.length) title = lines[0];
+  title = title
+    .replace(/[「」『』（）()\[\]<>《》〈〉]/g, '')
+    .replace(/^[、。．,.\s]+|[、。．,.\s]+$/g, '')
+    .replace(/[\/\\:*?"<>|\n\r\t]/g, '')
+    .slice(0, 24)
+    .trim();
+  return title ? `${title}.${format}` : `subtitles.${format}`;
+}
+
 function exportOutput(format) {
   const text = document.getElementById('outputText').value;
   if (!text.trim()) return;
@@ -763,7 +779,7 @@ function exportOutput(format) {
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href     = url;
-  a.download = `subtitles.${format}`;
+  a.download = generateFilename(text, format);
   a.click();
   URL.revokeObjectURL(url);
 }
