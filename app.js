@@ -723,18 +723,28 @@ function formatVTTTime(seconds) {
 }
 
 function generateFilename(text, format) {
-  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-  let title = '';
-  for (const line of lines) {
-    if (line.length >= 8) { title = line; break; }
+  // カタカナ・漢字の2文字以上、英数字3文字以上を単語として抽出
+  const tokens = [
+    ...(text.match(/[ァ-ヴー]{2,}/g) || []),
+    ...(text.match(/[一-龯]{2,}/g) || []),
+    ...(text.match(/[A-Za-z0-9]{3,}/g) || []),
+  ];
+  const counts = {};
+  for (const t of tokens) counts[t] = (counts[t] || 0) + 1;
+  const ranked = Object.keys(counts).sort((a, b) => {
+    const d = counts[b] - counts[a];
+    return d !== 0 ? d : b.length - a.length;
+  });
+  // 上位の単語を24文字以内に収める範囲で連結
+  const picked = [];
+  let total = 0;
+  for (const w of ranked) {
+    if (total + w.length + (picked.length ? 1 : 0) > 24) break;
+    picked.push(w);
+    total += w.length + (picked.length > 1 ? 1 : 0);
+    if (picked.length >= 3) break;
   }
-  if (!title && lines.length) title = lines[0];
-  title = title
-    .replace(/[「」『』（）()\[\]<>《》〈〉]/g, '')
-    .replace(/^[、。．,.\s]+|[、。．,.\s]+$/g, '')
-    .replace(/[\/\\:*?"<>|\n\r\t]/g, '')
-    .slice(0, 24)
-    .trim();
+  const title = picked.join('_').replace(/[\/\\:*?"<>|]/g, '');
   return title ? `${title}.${format}` : `subtitles.${format}`;
 }
 
