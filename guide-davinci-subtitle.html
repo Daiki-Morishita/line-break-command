@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DaVinci Resolve 字幕作成ガイド｜Fairlight・Fusion・字幕トラックの使い方 – SubLine</title>
+  <meta name="description" content="DaVinci Resolveで字幕・テロップを作る方法を解説。字幕トラック・Fusionテキスト・SRT読み込みの3つの手法と、無料版でも使える機能を中心に効率化のコツを紹介します。">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://line-break-command.vercel.app/guide-davinci-subtitle">
+  <link rel="stylesheet" href="style.css">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FKM6SXP7YE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FKM6SXP7YE');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4355731853778451" crossorigin="anonymous"></script>
+  <meta name="google-adsense-account" content="ca-pub-4355731853778451">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo" style="text-decoration:none">
+        <span class="logo-icon">↵</span>
+        <span class="logo-text">SubLine</span>
+      </a>
+      <span class="tagline">日本語字幕・テロップ作り専用の自動改行ツール</span>
+    </div>
+  </header>
+
+  <main>
+    <article class="static-page">
+      <h1>DaVinci Resolve 字幕作成ガイド｜Fairlight・Fusion・字幕トラックの使い方</h1>
+      <p class="updated">公開日：2026年5月14日</p>
+
+      <p>DaVinci Resolveは無料版でもプロレベルの機能が使える動画編集ソフトで、字幕作成においても豊富な選択肢が用意されています。本記事ではDaVinci Resolveで字幕を作る代表的な方法と、それぞれの特徴・適した用途を解説します。</p>
+
+      <h2>DaVinci Resolveの字幕機能の特徴</h2>
+      <p>DaVinci Resolveの字幕機能は、無料版でも基本的なキャプション編集・SRT/VTTの読み込み書き出し・複数言語字幕の管理など、ほとんどの実務的なニーズに対応します。有料版（DaVinci Resolve Studio）では、自動文字起こし機能や高度なテキスト効果が追加されます。</p>
+
+      <h2>字幕作成の3つの方法</h2>
+
+      <h3>方法1：字幕トラックを使う</h3>
+      <p>タイムライン上に専用の字幕トラックを作り、各字幕クリップにテキストを入力する方法です。EDITページのタイムライン左側で右クリックし、「字幕トラックの追加」を選択するだけで字幕トラックが作成されます。</p>
+      <p>字幕クリップごとに表示開始・終了時刻を設定でき、フォント・サイズ・色・位置を統一して適用できます。字幕の見た目を一括で変更したいときや、後からSRT/VTTファイルとして書き出したいときに最適な方法です。</p>
+
+      <h3>方法2：Fusionテキストでテロップを作る</h3>
+      <p>デザイン性の高いテロップやアニメーション付きテキストを作りたい場合は、Fusionテキストを使います。EDITページのエフェクトライブラリから「Text+」をタイムラインに配置することで、Fusionの高度なテキストエンジンを使えます。</p>
+      <p>文字色のグラデーション、文字ごとのアニメーション、3D変形などの高度な表現が可能です。タイトルロゴやチャプターヘッダー、強調用テロップに向いています。</p>
+
+      <h3>方法3：SRT・VTTファイルを読み込む</h3>
+      <p>外部で作成した字幕ファイルを読み込む方法です。メディアプールにSRTやVTTファイルをドラッグ&ドロップするだけで、タイムラインに字幕クリップとして配置できます。読み込んだ字幕は字幕トラック上で編集可能で、表示時刻の調整やテキストの修正もできます。</p>
+      <p>SubLineで原稿テキストを改行整形してSRTで書き出し、DaVinci Resolveに読み込んでタイムコードを調整する、という流れが効率的です。</p>
+
+      <h2>字幕スタイルの設定</h2>
+      <p>字幕トラックを使う場合、字幕の見た目はインスペクタパネルで設定します。設定できる主な項目は以下のとおりです。</p>
+      <ul>
+        <li>フォントファミリー・サイズ・ウェイト</li>
+        <li>文字色・縁取り色・縁取り幅</li>
+        <li>背景帯の色・不透明度</li>
+        <li>テキスト整列（中央・左・右）</li>
+        <li>画面内位置（X座標・Y座標）</li>
+        <li>アンカーポイント</li>
+      </ul>
+      <p>これらの設定は字幕トラック全体に一括適用できるため、複数の字幕クリップのデザインを後から変更するときに便利です。</p>
+
+      <h2>DaVinci Resolve Studioの自動文字起こし</h2>
+      <p>有料版のDaVinci Resolve Studioでは、AIによる自動文字起こし機能が使えます。音声クリップを選択し「Transcribe Audio」を実行すると、文字起こし結果が字幕クリップとしてタイムラインに自動配置されます。タイムコードも音声に合わせて自動設定されるため、後の調整作業が大幅に短縮されます。</p>
+      <p>ただし日本語の認識精度は完全ではないため、生成された字幕は必ず確認・修正が必要です。誤変換や不自然な改行が含まれている場合は、SubLineに貼り付け直して整形することで、品質と効率を両立できます。</p>
+
+      <h2>字幕の書き出し</h2>
+      <p>編集完了後、字幕付きで動画を書き出す方法は2通りあります。</p>
+
+      <h3>動画に焼き付ける（バーンイン）</h3>
+      <p>書き出し設定の「字幕」セクションで「ビデオに焼き付ける」を選択すると、字幕が動画ファイルに直接合成されます。SNS動画や独自配信サイト向けに、字幕付きの1ファイルとして配信したい場合に使います。</p>
+
+      <h3>別ファイルとして書き出す</h3>
+      <p>同じく書き出し設定で「サイドカーファイルとして書き出す」を選択すると、動画ファイルとは別にSRTやVTTファイルが生成されます。YouTubeなどに動画と字幕を別々にアップロードする場合や、後から字幕を修正できる状態を保ちたい場合に有効です。</p>
+
+      <h2>DaVinci Resolveでの字幕作成のコツ</h2>
+
+      <h3>1. プロジェクト設定で字幕の標準値を決める</h3>
+      <p>プロジェクトを開始する前に、字幕のフォント・サイズ・位置の標準値を決めておきます。途中で変更すると過去の字幕クリップすべてに反映されない場合があり、手戻りの原因になります。</p>
+
+      <h3>2. 字幕クリップの長さを統一する</h3>
+      <p>すべての字幕クリップを「3秒」「5秒」など固定の長さで配置すると、リズミカルで読みやすい字幕展開になります。文字数に応じて柔軟に変えるのも有効ですが、極端なバラつきは避けます。</p>
+
+      <h3>3. 字幕の色をシーンに合わせる</h3>
+      <p>明るいシーンが続く部分では黒文字+白縁取り、暗いシーンが続く部分では白文字+黒縁取りに切り替えると、視認性が一貫します。シーンごとに字幕スタイルを切り替えるテクニックは、プロの編集現場でも使われます。</p>
+
+      <h2>SubLineとの連携</h2>
+      <p>DaVinci Resolveに取り込む前のテキスト整形には、SubLineが活躍します。原稿を最大文字数で改行整形してSRT形式で書き出し、メディアプールに読み込めば、改行ルールが統一された字幕クリップが一気に作成されます。後はタイムコードを音声に合わせて調整するだけで、長尺動画でも短時間で字幕作成が完了します。</p>
+
+      <h2>関連ガイド</h2>
+      <ul>
+        <li><a href="guide-premiere-subtitle.html">Premiere Pro 字幕作成完全ガイド</a></li>
+        <li><a href="guide-srt-vtt.html">SRT・VTTファイル形式の違いと使い分け</a></li>
+        <li><a href="guide-transcription-workflow.html">文字起こしから字幕完成までのワークフロー</a></li>
+      </ul>
+
+      <p><a href="index.html" class="back-link">← SubLineを使う</a></p>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="privacy.html">プライバシーポリシー</a>
+        <a href="terms.html">利用規約</a>
+        <a href="contact.html">お問い合わせ</a>
+      </div>
+      <div class="footer-copy">© 2026 SubLine</div>
+    </div>
+  </footer>
+
+</body>
+</html>

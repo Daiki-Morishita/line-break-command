@@ -21,6 +21,41 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://line-break-command.vercel.app/guide-premiere-subtitle</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://line-break-command.vercel.app/guide-davinci-subtitle</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://line-break-command.vercel.app/guide-srt-vtt</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://line-break-command.vercel.app/guide-tiktok-subtitle</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://line-break-command.vercel.app/guide-japanese-typography</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://line-break-command.vercel.app/guide-transcription-workflow</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://line-break-command.vercel.app/guide-subtitle-mistakes</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://line-break-command.vercel.app/privacy</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>

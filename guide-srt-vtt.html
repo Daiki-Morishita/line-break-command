@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SRT・VTT字幕ファイル形式の違いと使い分け｜記述ルールから変換まで – SubLine</title>
+  <meta name="description" content="動画字幕で使われるSRT・WebVTT・SSA/ASSなど主要な字幕ファイル形式の違いと、それぞれの記述ルール・対応プラットフォーム・変換方法を実例付きで詳しく解説します。">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://line-break-command.vercel.app/guide-srt-vtt">
+  <link rel="stylesheet" href="style.css">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FKM6SXP7YE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FKM6SXP7YE');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4355731853778451" crossorigin="anonymous"></script>
+  <meta name="google-adsense-account" content="ca-pub-4355731853778451">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo" style="text-decoration:none">
+        <span class="logo-icon">↵</span>
+        <span class="logo-text">SubLine</span>
+      </a>
+      <span class="tagline">日本語字幕・テロップ作り専用の自動改行ツール</span>
+    </div>
+  </header>
+
+  <main>
+    <article class="static-page">
+      <h1>SRT・VTT字幕ファイル形式の違いと使い分け｜記述ルールから変換まで</h1>
+      <p class="updated">公開日：2026年5月14日</p>
+
+      <p>動画字幕の世界では複数のファイル形式が使われており、用途や配信プラットフォームに応じて使い分けが必要です。本記事では、最も普及しているSRT（SubRip）とWebVTT（VTT）を中心に、SSA/ASSなどの形式についても、それぞれの特徴・記述ルール・変換方法を実例とともに解説します。</p>
+
+      <h2>SRT形式（SubRip Subtitle）</h2>
+      <p>SRTは1990年代後半に登場した非常にシンプルな字幕ファイル形式で、現在も世界中で最も広く使われています。テキストエディタで開ける単純な構造のため、手作業での編集や、プログラムによる自動生成・変換が容易です。</p>
+
+      <h3>SRTの基本構造</h3>
+      <p>SRTファイルは、1つの字幕ブロックが「番号」「タイムコード」「字幕テキスト」の3行で構成されます。ブロックとブロックは空白行で区切ります。タイムコードは「時:分:秒,ミリ秒」形式で、開始時刻と終了時刻を「-->」で繋ぎます。</p>
+      <p>1
+00:00:01,000 --> 00:00:03,500
+こんにちは、SubLineへようこそ
+
+このように、番号は1から順に振り、タイムコードはミリ秒の区切りにカンマを使うのがSRTの慣例です。</p>
+
+      <h3>SRTの対応プラットフォーム</h3>
+      <p>SRTはYouTube・Vimeo・Facebook・Twitter（X）・TikTok・Instagram など、ほぼすべての動画プラットフォームで対応されています。Premiere Pro・Final Cut Pro・DaVinci Resolveなどの主要な動画編集ソフトでも読み込み・書き出しに対応しています。互換性の高さから、字幕配布の標準形式として最も無難な選択肢です。</p>
+
+      <h2>WebVTT形式（Web Video Text Tracks）</h2>
+      <p>WebVTTはHTML5のvideo要素で字幕を表示するために策定された形式で、SRTを拡張・モダン化したものです。Webブラウザでの動画字幕表示や、HLS（HTTP Live Streaming）配信での字幕埋め込みに適しています。</p>
+
+      <h3>VTTの基本構造</h3>
+      <p>VTTファイルの先頭には「WEBVTT」というヘッダー行が必要です。各字幕ブロックの構造はSRTに似ていますが、タイムコードの区切りはカンマではなくピリオドを使います。また、字幕番号は省略可能で、各ブロックにスタイル属性や位置指定を付与できる拡張性があります。</p>
+      <p>WEBVTT
+
+00:00:01.000 --> 00:00:03.500
+こんにちは、SubLineへようこそ
+
+VTTでは、CSSライクな記述で文字色・位置・整列方法を指定できるため、Web上で動画字幕の見た目を細かく制御したい場合に有効です。</p>
+
+      <h3>VTTの対応プラットフォーム</h3>
+      <p>VTTはHTML5動画プレーヤーを使うサイト全般で対応しており、HLS配信を行うストリーミングサービス（Apple TV、独自配信サイト等）でも標準的に使われます。WebアプリケーションやLMS（学習管理システム）で動画を配信する場合は、VTTが推奨されることが多いです。</p>
+
+      <h2>SSA/ASS形式（Sub Station Alpha / Advanced SubStation Alpha）</h2>
+      <p>SSA/ASSはアニメ字幕などで使われる高機能な字幕形式で、フォント・色・位置・アニメーションを細かく指定できるのが特徴です。1つの動画に複数の話者を区別する字幕を表示したり、画面内の特定の位置に注釈を表示したりといった、表現力の高い字幕作成が可能です。</p>
+      <p>ただし、対応プレーヤーは限定的（VLC・MPCなど）で、YouTubeなどの主要プラットフォームには直接対応していません。高度な字幕表現が必要な場合のみ採用される形式です。</p>
+
+      <h2>形式の使い分けガイド</h2>
+
+      <h3>YouTube・SNS動画への投稿 → SRT</h3>
+      <p>最も互換性が高く、ほぼすべてのプラットフォームで動作します。迷ったらSRTを選んでおけば失敗しません。</p>
+
+      <h3>HTML5動画プレーヤーでの配信 → VTT</h3>
+      <p>独自配信サイトや学習プラットフォームを構築する場合は、VTTを使うと表示制御が柔軟にできます。</p>
+
+      <h3>動画編集ソフトでの取り込み → SRT</h3>
+      <p>Premiere Pro・Final Cut Pro・DaVinci Resolveいずれも、SRTの読み込みは安定しています。VTTも一部対応していますが、SRTの方が確実です。</p>
+
+      <h3>アニメ・高度な演出 → SSA/ASS</h3>
+      <p>専門的な字幕制作を行う場合の選択肢です。一般的な動画では使われません。</p>
+
+      <h2>形式間の変換</h2>
+      <p>SRTとVTTは構造が似ているため、相互変換は比較的簡単です。タイムコードの区切り文字（カンマ⇄ピリオド）を変えるだけで変換できる場合が多く、VTTには先頭に「WEBVTT」行を追加します。SubLineでは、入力テキストから直接SRT・VTT両形式で書き出すことができます。</p>
+
+      <h2>字幕作成時の注意点</h2>
+      <p>どの形式を使う場合でも、文字コードはUTF-8（BOMなし）を選ぶのが安全です。Shift-JISや他のエンコードで保存すると、配信プラットフォーム側で文字化けする場合があります。タイムコードは必ず連続性を保ち、前後の字幕で時間が重ならないように調整します。</p>
+      <p>また、字幕の表示時間は読み取り時間とのバランスが重要です。文字数に応じて1秒あたり4〜6文字程度のペースで読めるよう、最低1.5秒、長くても7秒程度の範囲に収めるのが一般的な目安とされています。</p>
+
+      <h2>SubLineで効率化する</h2>
+      <p>SubLineは原稿テキストを最大文字数内で自動改行し、SRT・VTT・JSON・CSV・TXT形式で書き出せます。改行整形済みのテキストを直接これらの形式で出力できるため、動画編集ソフトへの取り込みが大幅に楽になります。タイムコードは動画編集ソフト側で調整する前提の出力なので、原稿レベルの改行作業に集中したい場合に最適です。</p>
+
+      <h2>関連ガイド</h2>
+      <ul>
+        <li><a href="guide-premiere-subtitle.html">Premiere Pro 字幕作成完全ガイド</a></li>
+        <li><a href="guide-youtube-subtitle.html">YouTube字幕の作り方完全ガイド</a></li>
+        <li><a href="guide-subtitle-length.html">字幕の文字数は何文字が適切？</a></li>
+      </ul>
+
+      <p><a href="index.html" class="back-link">← SubLineを使う</a></p>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="privacy.html">プライバシーポリシー</a>
+        <a href="terms.html">利用規約</a>
+        <a href="contact.html">お問い合わせ</a>
+      </div>
+      <div class="footer-copy">© 2026 SubLine</div>
+    </div>
+  </footer>
+
+</body>
+</html>

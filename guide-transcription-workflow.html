@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文字起こしから字幕完成までの実践ワークフロー｜効率化の全ステップ – SubLine</title>
+  <meta name="description" content="動画の文字起こしから字幕完成までの実践的なワークフローを、ツール選びから整形・タイムコード調整・書き出しまで具体的に解説。長尺動画の制作時間を大幅に短縮するコツも紹介。">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://line-break-command.vercel.app/guide-transcription-workflow">
+  <link rel="stylesheet" href="style.css">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FKM6SXP7YE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FKM6SXP7YE');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4355731853778451" crossorigin="anonymous"></script>
+  <meta name="google-adsense-account" content="ca-pub-4355731853778451">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo" style="text-decoration:none">
+        <span class="logo-icon">↵</span>
+        <span class="logo-text">SubLine</span>
+      </a>
+      <span class="tagline">日本語字幕・テロップ作り専用の自動改行ツール</span>
+    </div>
+  </header>
+
+  <main>
+    <article class="static-page">
+      <h1>文字起こしから字幕完成までの実践ワークフロー｜効率化の全ステップ</h1>
+      <p class="updated">公開日：2026年5月14日</p>
+
+      <p>1時間以上の長尺動画やインタビュー動画では、字幕作成にかかる時間が動画編集全体の大きな部分を占めます。本記事では、音声の文字起こしから字幕の完成まで、効率的に進めるための実践的なワークフローを、各ステップで使うツールと注意点とともに具体的に解説します。</p>
+
+      <h2>全体の流れ（5ステップ）</h2>
+      <ol>
+        <li>音声から文字起こし</li>
+        <li>原稿のクリーンアップ（誤変換修正・整理）</li>
+        <li>字幕用の改行整形</li>
+        <li>字幕ファイル化とタイムコード設定</li>
+        <li>動画への合成・書き出し</li>
+      </ol>
+      <p>このうち、ステップ2〜3が最も時間がかかる部分で、SubLineが効率化に貢献するのもこの工程です。</p>
+
+      <h2>ステップ1：音声から文字起こし</h2>
+
+      <h3>選択肢A：自動文字起こしツール</h3>
+      <p>近年は音声認識技術の進化により、自動文字起こしの精度が大幅に向上しています。代表的なサービスにはOpenAIのWhisper、GoogleのCloud Speech-to-Text、Amazon Transcribe、Premiere Proの「スピーチからテキストへ」機能などがあります。日本語の精度はサービスによって差があり、専門用語や固有名詞、滑舌の影響を受けやすい部分は誤変換が発生します。</p>
+      <p>無料で始めるなら、Whisperのオープンソース版が高精度かつ無制限で使えます。Whisperは複数のモデルサイズがあり、largeモデルを使えば商用サービスに匹敵する精度が得られます。ローカルマシンで動作するため、機密性の高い動画の文字起こしにも適しています。</p>
+
+      <h3>選択肢B：手動文字起こし</h3>
+      <p>専門性が高い動画や、最終的な品質を妥協できない場合は、人間による文字起こしが確実です。クラウドソーシングサービスや専門の文字起こし業者に依頼できますが、コストは1時間あたり数千円〜となります。自動文字起こしの結果をベースに人間が校正する「ハイブリッド方式」が、コストと品質のバランスが取れた現実的な選択肢です。</p>
+
+      <h2>ステップ2：原稿のクリーンアップ</h2>
+      <p>文字起こしされた生の原稿は、そのまま字幕にすると非常に読みにくいです。以下の整理作業が必要です。</p>
+
+      <h3>不要な間投詞の削除</h3>
+      <p>「えーと」「あの」「まあ」「そうですね」など、話し言葉特有のフィラーは字幕では不要です。これらを削除するだけで、字幕の読みやすさが大幅に向上します。テキストエディタの一括置換機能で、よく出る間投詞をまとめて削除すると効率的です。</p>
+
+      <h3>誤変換の修正</h3>
+      <p>自動文字起こしでは、同音異義語や固有名詞で必ず誤変換が発生します。原稿全体を読みながら、文脈に応じて正しい表記に修正します。専門用語のリストを事前に用意しておくと、修正作業がスムーズになります。</p>
+
+      <h3>長文の分割</h3>
+      <p>話し言葉では1つの文が極端に長くなることがあります。意味のまとまりごとに句点で区切り、字幕用に扱いやすい長さに整理します。1文あたり40〜60文字程度に収めるのが、後の改行整形で扱いやすいサイズです。</p>
+
+      <h2>ステップ3：字幕用の改行整形</h2>
+      <p>クリーンアップ済みの原稿を、字幕として表示するための改行整形を行います。手動で1行ずつ改行位置を決めるのは、長尺動画では膨大な時間がかかるため、自動改行ツールの使用が現実的です。</p>
+      <p>SubLineは、原稿テキストを貼り付けて最大文字数を指定するだけで、意味の切れ目で自動改行します。最大文字数27（YouTube動画想定）、20（縦型動画想定）など、配信する媒体に応じて設定するだけで、全体が統一された改行ルールで整形されます。</p>
+      <p>改行整形の段階で、不要な空白行の削除、句読点の削除（字幕では省略が一般的）、半角スペースへの置換など、字幕特有の整形オプションも一括適用できます。</p>
+
+      <h2>ステップ4：字幕ファイル化とタイムコード設定</h2>
+
+      <h3>SRT形式での書き出し</h3>
+      <p>整形済みのテキストをSRT形式で書き出します。SubLineではSRT書き出しに対応しており、字幕番号と仮のタイムコードが自動で付与されたSRTファイルが生成されます。</p>
+
+      <h3>タイムコードの調整</h3>
+      <p>SubLineの出力には実際の音声タイミングが反映されていないため、動画編集ソフトで字幕の表示開始時刻と終了時刻を音声に合わせて調整します。Premiere Pro・Final Cut Pro・DaVinci Resolveのいずれも、SRTを読み込んでタイムライン上で字幕クリップとして編集できます。</p>
+      <p>自動文字起こしツールにタイムコード機能がある場合（Whisperの「verbose_json」出力など）、そのタイムコードを字幕ファイルに反映させることで、調整工程を大幅に短縮できます。</p>
+
+      <h2>ステップ5：動画への合成・書き出し</h2>
+      <p>タイムコード調整が完了したら、動画と字幕を1つのファイルに合成して書き出します。書き出し方法は2通りあります。</p>
+
+      <h3>バーンイン（焼き付け）</h3>
+      <p>動画ファイルに字幕を直接合成する方法です。1つの動画ファイルだけで字幕付き動画として配信できるため、SNS動画やWebサイト埋め込みに適しています。一度焼き付けると後から字幕の修正ができない点に注意します。</p>
+
+      <h3>別ファイル方式</h3>
+      <p>字幕をSRTやVTTの独立ファイルとして配布する方法です。YouTubeなどでは動画と字幕を別々にアップロードでき、視聴者が字幕の表示/非表示を切り替えられます。多言語字幕にも対応しやすい方式です。</p>
+
+      <h2>長尺動画での時間短縮のコツ</h2>
+      <p>1時間以上の動画では、各ステップでの効率化が累積的に大きな時間短縮につながります。文字起こしはWhisper largeモデルで一気に処理し、クリーンアップは正規表現での一括置換、改行整形はSubLineの自動処理、タイムコード調整は文字起こし時のタイムコードを活用、という組み合わせで、従来1日かかっていた作業が数時間に短縮できる可能性があります。</p>
+      <p>ワークフローの各段階で「自動化できる部分」と「人間の判断が必要な部分」を明確に分けることで、効率と品質の両立が実現します。</p>
+
+      <h2>関連ガイド</h2>
+      <ul>
+        <li><a href="guide-youtube-subtitle.html">YouTube字幕の作り方完全ガイド</a></li>
+        <li><a href="guide-srt-vtt.html">SRT・VTTファイル形式の違いと使い分け</a></li>
+        <li><a href="guide-premiere-subtitle.html">Premiere Pro 字幕作成完全ガイド</a></li>
+      </ul>
+
+      <p><a href="index.html" class="back-link">← SubLineを使う</a></p>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="privacy.html">プライバシーポリシー</a>
+        <a href="terms.html">利用規約</a>
+        <a href="contact.html">お問い合わせ</a>
+      </div>
+      <div class="footer-copy">© 2026 SubLine</div>
+    </div>
+  </footer>
+
+</body>
+</html>

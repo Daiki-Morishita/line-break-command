@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Premiere Pro 字幕作成完全ガイド｜キャプション・テロップ・読み込みの全手順 – SubLine</title>
+  <meta name="description" content="Adobe Premiere Proで字幕・テロップを作る3つの方法（キャプション機能・エッセンシャルグラフィックス・SRT読み込み）を実例付きで解説。スピーチからテキスト、レスポンシブデザイン、書き出し設定までカバー。">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://line-break-command.vercel.app/guide-premiere-subtitle">
+  <link rel="stylesheet" href="style.css">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-FKM6SXP7YE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-FKM6SXP7YE');
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4355731853778451" crossorigin="anonymous"></script>
+  <meta name="google-adsense-account" content="ca-pub-4355731853778451">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo" style="text-decoration:none">
+        <span class="logo-icon">↵</span>
+        <span class="logo-text">SubLine</span>
+      </a>
+      <span class="tagline">日本語字幕・テロップ作り専用の自動改行ツール</span>
+    </div>
+  </header>
+
+  <main>
+    <article class="static-page">
+      <h1>Premiere Pro 字幕作成完全ガイド｜キャプション・テロップ・読み込みの全手順</h1>
+      <p class="updated">公開日：2026年5月14日</p>
+
+      <p>Adobe Premiere Proは動画編集の業界標準ソフトの1つで、字幕・テロップを入れる方法も複数用意されています。本記事ではPremiere Proで字幕を作る代表的な3つの方法と、それぞれの特徴・適した用途・効率化のコツを実務目線で解説します。</p>
+
+      <h2>Premiere Proで字幕を作る3つの方法</h2>
+
+      <h3>方法1：キャプション機能を使う（標準字幕）</h3>
+      <p>Premiere Proの「キャプション」機能は、字幕ファイルとして書き出したり、別言語の字幕を後から追加したりするのに最も適した方法です。YouTubeやNetflixなどのストリーミング配信で求められるSRT/VTTといった字幕ファイル形式と互換性があり、ワークフローの自由度が高いのが特徴です。</p>
+      <p>使い方は、「ファイル」→「新規」→「キャプション」を選び、タイムラインにキャプショントラックを作成します。各キャプションには表示開始時刻と終了時刻を設定でき、画面下部のキャプションパネルでテキストを編集します。フォント・色・位置はテンプレート的に統一でき、後から一括変更も可能です。</p>
+
+      <h3>方法2：エッセンシャルグラフィックスでテロップを作る</h3>
+      <p>デザイン性の高いテロップ（タイトル・字幕枠・アニメーション付き文字）を作りたい場合は、エッセンシャルグラフィックスパネルを使うのが定番です。テキストレイヤーごとに自由な装飾を施せるため、バラエティ番組風のカラフルなテロップや、企業VPで使う洗練されたデザインまで幅広く対応できます。</p>
+      <p>1つテンプレートを作って「.mogrt」形式で保存すれば、別プロジェクトでも同じデザインを再利用できます。チームで字幕デザインを統一したい場合に特に有効です。</p>
+
+      <h3>方法3：外部の字幕ファイル（SRT）を読み込む</h3>
+      <p>あらかじめテキストエディタや専用ツールで作成したSRTファイルを、「ファイル」→「読み込み」でPremiere Proに取り込む方法です。タイムコードと字幕テキストが対になったSRTファイルを使えば、すでに字幕作成済みの動画を効率的に編集に取り込めます。</p>
+      <p>SubLineで最大文字数を指定して改行整形したテキストをSRT形式で書き出し、Premiere Proで読み込んでタイムコードを微調整する、というワークフローが特に時間効率に優れます。</p>
+
+      <h2>スピーチからテキストへ機能の活用</h2>
+      <p>Premiere Pro 2022以降には「スピーチからテキストへ」機能が搭載されており、音声を自動で文字起こしできます。インタビュー動画やナレーション動画では、この機能で文字起こし → SubLineで改行整形 → エッセンシャルグラフィックスでテロップ化、という流れが効率的です。</p>
+      <p>ただし、自動文字起こしの精度は完全ではありません。専門用語・固有名詞・滑舌の影響を受けやすい部分は必ず手動で修正する作業が発生します。完成原稿として使うには、誤変換の修正と文章の整形（改行・句読点調整）が必要です。</p>
+
+      <h2>テロップを読みやすくする設計原則</h2>
+
+      <h3>1. フォントサイズと画面占有率</h3>
+      <p>YouTube動画では、画面の縦幅に対してフォント高さが3〜5%程度が読みやすい目安です。スマートフォン視聴を前提とするなら、より大きめ（5〜7%）に設定するのがおすすめです。</p>
+
+      <h3>2. 背景帯または縁取り</h3>
+      <p>動画の背景が明るい・暗い・複雑な絵柄など、シーンによって字幕の視認性は大きく変わります。半透明の背景帯や、文字の縁取り（境界線）を付けることで、どのシーンでも安定して読めるようになります。</p>
+
+      <h3>3. 1行の文字数</h3>
+      <p>横型動画では1行あたり20〜30文字を目安にします。長すぎる字幕は読み切れず、視聴者の視線が動画本編から離れてしまいます。SubLineで最大文字数を指定して自動改行することで、行ごとのバラつきをなくせます。</p>
+
+      <h2>字幕の書き出し設定</h2>
+      <p>編集が完了したら、書き出し時に字幕を動画に焼き付ける（バーンイン）か、別ファイルとして保持するかを選択できます。バーンインは1つの動画ファイルだけで字幕付き動画として配信できるメリットがあり、SNS動画や一般的なYouTube動画ではこちらが主流です。</p>
+      <p>一方、別ファイルで保持する場合はSRT・VTT形式でエクスポートできます。YouTubeに動画と字幕ファイルを別々にアップロードする場合や、後から多言語字幕を追加したい場合に有効です。</p>
+
+      <h2>SubLineとの連携ワークフロー</h2>
+      <p>SubLineは、Premiere Proにテキストを持ち込む前の「原稿整形」段階で威力を発揮します。文字起こししたテキストや台本原稿を貼り付け、最大文字数を指定するだけで、字幕として読みやすい改行に自動整形できます。整形後はSRT形式で書き出してPremiere Proに読み込むか、テキストをコピーしてエッセンシャルグラフィックスのテキストレイヤーに貼り付けて使えます。</p>
+      <p>1時間以上の長尺動画では、字幕作成にかかる時間が大幅に短縮されるため、編集全体の効率が向上します。</p>
+
+      <h2>関連ガイド</h2>
+      <ul>
+        <li><a href="guide-subtitle-length.html">字幕の文字数は何文字が適切？</a></li>
+        <li><a href="guide-srt-vtt.html">SRT・VTTファイル形式の違いと使い分け</a></li>
+        <li><a href="guide-transcription-workflow.html">文字起こしから字幕完成までのワークフロー</a></li>
+      </ul>
+
+      <p><a href="index.html" class="back-link">← SubLineを使う</a></p>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="privacy.html">プライバシーポリシー</a>
+        <a href="terms.html">利用規約</a>
+        <a href="contact.html">お問い合わせ</a>
+      </div>
+      <div class="footer-copy">© 2026 SubLine</div>
+    </div>
+  </footer>
+
+</body>
+</html>
